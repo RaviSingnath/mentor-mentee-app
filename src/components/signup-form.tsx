@@ -1,19 +1,23 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
+  FieldLegend,
+  FieldSet,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import Link from "next/link";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   return (
@@ -58,6 +62,20 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <Input id="confirm-password" type="password" required />
               <FieldDescription>Please confirm your password.</FieldDescription>
             </Field>
+            <FieldSet className="w-full max-w-xs">
+              <FieldLegend variant="label">Who you are?</FieldLegend>
+
+              <RadioGroup defaultValue="comfortable" className="w-fit flex">
+                <div className="flex items-center gap-3">
+                  <RadioGroupItem value="default" id="r1" />
+                  <Label htmlFor="r1">Mentor</Label>
+                </div>
+                <div className="flex items-center gap-3">
+                  <RadioGroupItem value="comfortable" id="r2" />
+                  <Label htmlFor="r2">Mentee</Label>
+                </div>
+              </RadioGroup>
+            </FieldSet>
             <FieldGroup>
               <Field>
                 <Button type="submit">Create Account</Button>
