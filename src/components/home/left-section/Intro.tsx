@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { IconLink } from "@/components/home/IconLink";
 import { Logo } from "@/components/home/Logo";
-import { SignUpForm } from "@/components/auth/SignUpForm";
-import { SignInForm } from "../../auth/sign-in-form";
 
 function GitHubIcon(props: React.ComponentPropsWithoutRef<"svg">) {
   return (
@@ -35,8 +33,6 @@ export function Intro() {
         gives both sides simple tools to plan sessions, share notes, and see how
         far they&#39;ve come.
       </p>
-      {/* <SignUpForm />
-      <SignInForm /> */}
     </>
   );
 }
