@@ -23,12 +23,30 @@ import {
   FieldLegend,
   FieldSet,
 } from "@/components/ui/field";
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from "@/components/ui/combobox";
+import { Item, ItemContent, ItemTitle } from "@/components/ui/item";
 import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 import { TSignUp, zSignUp } from "@/features/auth/auth.schema";
-import UserRole from "@/lib/rbac/roles";
+import UserRole, { UserRoleLabel } from "@/lib/rbac/roles";
 import { signUpAction } from "@/features/auth/auth.actions";
+
+type RoleOption = {
+  role: UserRole;
+  label: string;
+};
+
+const roles: RoleOption[] = [
+  { role: UserRole.MENTOR, label: UserRoleLabel.mentor },
+  { role: UserRole.MENTEE, label: UserRoleLabel.mentee },
+];
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter();
@@ -47,7 +65,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       email: "",
       password: "",
       confirm_password: "",
-      role: UserRole.MENTEE,
+      role: "",
     },
   });
 
@@ -182,29 +200,50 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
 
             {/* Role */}
             <FieldSet data-invalid={!!errors.role}>
-              <FieldLegend variant="label">Who you are?</FieldLegend>
+              <FieldLabel
+                htmlFor="role"
+                className={errors.role ? "text-destructive" : undefined}
+              >
+                Who you are?
+              </FieldLabel>
 
               <Controller
                 name="role"
                 control={control}
                 render={({ field }) => (
-                  <RadioGroup
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    className="flex w-fit"
+                  <Combobox
+                    items={roles}
+                    value={
+                      roles.find((role) => role.role === field.value) ?? null
+                    }
+                    onValueChange={(role) => field.onChange(role?.role ?? "")}
                   >
-                    <div className="flex items-center gap-3">
-                      <RadioGroupItem value={UserRole.MENTOR} id="mentor" />
+                    <ComboboxInput
+                      id="role"
+                      name={field.name}
+                      ref={field.ref}
+                      onBlur={field.onBlur}
+                      aria-invalid={!!errors.role}
+                    />
 
-                      <FieldLabel htmlFor="mentor">Mentor</FieldLabel>
-                    </div>
+                    <ComboboxContent>
+                      <ComboboxEmpty>No role found.</ComboboxEmpty>
 
-                    <div className="flex items-center gap-3">
-                      <RadioGroupItem value={UserRole.MENTEE} id="mentee" />
-
-                      <FieldLabel htmlFor="mentee">Mentee</FieldLabel>
-                    </div>
-                  </RadioGroup>
+                      <ComboboxList>
+                        {(role) => (
+                          <ComboboxItem key={role.role} value={role}>
+                            <Item size="xs" className="p-0">
+                              <ItemContent>
+                                <ItemTitle className="whitespace-nowrap">
+                                  {role.label}
+                                </ItemTitle>
+                              </ItemContent>
+                            </Item>
+                          </ComboboxItem>
+                        )}
+                      </ComboboxList>
+                    </ComboboxContent>
+                  </Combobox>
                 )}
               />
 

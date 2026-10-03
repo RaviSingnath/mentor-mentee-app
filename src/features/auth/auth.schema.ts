@@ -7,7 +7,13 @@ export const zSignUp = z
     email: z.email({
       message: "Invalid email address",
     }),
-    role: z.enum([UserRole.MENTOR, UserRole.MENTEE]),
+    role: z
+      .string()
+      .min(1, "Please select a role")
+      .refine(
+        (value) => Object.values(UserRole).includes(value as UserRole),
+        "Please select a valid role",
+      ),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirm_password: z.string().min(6, "Please confirm your password"),
   })

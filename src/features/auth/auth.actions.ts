@@ -1,3 +1,5 @@
+"use server";
+
 import { TSignUp, zSignUp, TLogin, zLogin } from "@/features/auth/auth.schema";
 import { ERROR_CODES } from "@/lib/errors/error-codes";
 import { handleError } from "@/lib/errors/handle-error";
