@@ -37,5 +37,29 @@ type loginServiceInput = {
 };
 
 export async function loginService({ data }: loginServiceInput) {
-  console.log("loginService: ", data);
+  const supabase = await createClient();
+
+  const { data: singInData, error: signInError } =
+    await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+
+  if (signInError) {
+    throw new Error("Error occured while singing in.");
+  }
+
+  return singInData;
+}
+
+export async function logoutService(): Promise<null> {
+  const supabase = await createClient();
+
+  const { error } = await supabase.auth.signOut();
+
+  if (error) {
+    throw new Error(error.message ?? "Signout failed. Please try again.");
+  }
+
+  return null;
 }

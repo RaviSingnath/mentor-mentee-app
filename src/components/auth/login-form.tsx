@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,6 +27,8 @@ import { zLogin, TLogin } from "@/features/auth/auth.schema";
 import { loginAction } from "@/features/auth/auth.actions";
 
 export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -65,6 +68,8 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
       }
 
       reset();
+      router.push("/profile");
+      router.refresh();
     } catch (error) {
       console.error(error);
 

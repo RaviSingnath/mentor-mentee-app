@@ -5,7 +5,7 @@ import { ERROR_CODES } from "@/lib/errors/error-codes";
 import { handleError } from "@/lib/errors/handle-error";
 import { getZodFieldErrors } from "@/lib/helper/get-zod-field-errors";
 import { ActionResponse } from "@/lib/types/action-response";
-import { loginService, signUpService } from "./auth.services";
+import { loginService, logoutService, signUpService } from "./auth.services";
 
 export async function signUpAction(formData: TSignUp): Promise<ActionResponse> {
   const validatedFields = zSignUp.safeParse(formData);
@@ -56,5 +56,23 @@ export async function loginAction(formData: TLogin): Promise<ActionResponse> {
     };
   } catch (error) {
     return handleError(error);
+  }
+}
+
+export async function logoutAction() {
+  try {
+    await logoutService();
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error
+          ? error.message
+          : "Signout failed. Please try again.",
+    };
   }
 }

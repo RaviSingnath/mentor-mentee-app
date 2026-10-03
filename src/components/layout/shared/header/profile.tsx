@@ -8,12 +8,12 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { profileDD } from "./data";
 import { cn } from "@/lib/utils";
 import { Mailbox, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import LogoutButton from "@/components/logout";
 export default function ProfileSheet() {
   return (
     <Sheet>
@@ -121,9 +121,7 @@ export default function ProfileSheet() {
                 </p>
               </div> */}
 
-              <Button variant="secondary" className="text-primary">
-                <Link href={"/auth/auth2/login"}> Log Out</Link>
-              </Button>
+              <LogoutButton />
             </div>
           </div>
         </SheetFooter>
