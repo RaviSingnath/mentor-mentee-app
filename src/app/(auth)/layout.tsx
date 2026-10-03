@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 import { ThemeProvider } from "@/app/providers";
 
-import "./globals.css";
+import "../globals.css";
 import LeftLayout from "@/components/home/left-section/left-layout";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 const monaSans = localFont({
-  src: "../fonts/Mona-Sans.var.woff2",
+  src: "../../fonts/Mona-Sans.var.woff2",
   display: "swap",
   variable: "--font-mona-sans",
   weight: "200 900",
@@ -51,7 +51,13 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="min-h-screen">{children}</div>
+          <div className="min-h-screen">
+            <LeftLayout />
+
+            <ThemeToggle />
+
+            {children}
+          </div>
         </ThemeProvider>
       </body>
     </html>
