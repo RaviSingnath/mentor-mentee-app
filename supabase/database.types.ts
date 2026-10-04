@@ -14,59 +14,401 @@ export type Database = {
   }
   public: {
     Tables: {
+      availability_slots: {
+        Row: {
+          end_time: string
+          id: string
+          profile_id: string
+          start_time: string
+          weekday: number
+        }
+        Insert: {
+          end_time: string
+          id?: string
+          profile_id: string
+          start_time: string
+          weekday: number
+        }
+        Update: {
+          end_time?: string
+          id?: string
+          profile_id?: string
+          start_time?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "availability_slots_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      document_chunks: {
+        Row: {
+          chunk_index: number
+          content: string
+          created_at: string
+          document_id: string
+          embedding: string
+          id: string
+          page_number: number | null
+          token_count: number | null
+        }
+        Insert: {
+          chunk_index: number
+          content: string
+          created_at?: string
+          document_id: string
+          embedding: string
+          id?: string
+          page_number?: number | null
+          token_count?: number | null
+        }
+        Update: {
+          chunk_index?: number
+          content?: string
+          created_at?: string
+          document_id?: string
+          embedding?: string
+          id?: string
+          page_number?: number | null
+          token_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_chunks_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      documents: {
+        Row: {
+          chunk_count: number
+          content_hash: string | null
+          created_at: string
+          error_message: string | null
+          id: string
+          mime_type: string
+          original_filename: string
+          size_bytes: number
+          status: Database["public"]["Enums"]["document_status"]
+          storage_path: string
+          title: string
+          updated_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          chunk_count?: number
+          content_hash?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          mime_type: string
+          original_filename: string
+          size_bytes: number
+          status?: Database["public"]["Enums"]["document_status"]
+          storage_path: string
+          title: string
+          updated_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          chunk_count?: number
+          content_hash?: string | null
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          mime_type?: string
+          original_filename?: string
+          size_bytes?: number
+          status?: Database["public"]["Enums"]["document_status"]
+          storage_path?: string
+          title?: string
+          updated_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documents_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_interactions: {
+        Row: {
+          action: Database["public"]["Enums"]["match_action"]
+          actor_id: string
+          candidate_id: string
+          created_at: string
+          id: string
+          score: number | null
+          subject_id: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["match_action"]
+          actor_id: string
+          candidate_id: string
+          created_at?: string
+          id?: string
+          score?: number | null
+          subject_id: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["match_action"]
+          actor_id?: string
+          candidate_id?: string
+          created_at?: string
+          id?: string
+          score?: number | null
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_interactions_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_interactions_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_interactions_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_topics: {
+        Row: {
+          profile_id: string
+          relation: Database["public"]["Enums"]["topic_relation"]
+          topic_id: string
+        }
+        Insert: {
+          profile_id: string
+          relation: Database["public"]["Enums"]["topic_relation"]
+          topic_id: string
+        }
+        Update: {
+          profile_id?: string
+          relation?: Database["public"]["Enums"]["topic_relation"]
+          topic_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_topics_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profile_topics_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
+          city: string | null
+          country: string | null
           created_at: string
           deleted_at: string | null
           email: string
+          experience_level:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
           full_name: string
           id: string
-          location: string | null
+          is_seed: boolean
+          languages: string[]
           role: Database["public"]["Enums"]["user_role"]
+          state: string | null
           status: Database["public"]["Enums"]["profile_status"]
+          timezone: string
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           deleted_at?: string | null
           email: string
+          experience_level?:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
           full_name: string
           id: string
-          location?: string | null
+          is_seed?: boolean
+          languages?: string[]
           role: Database["public"]["Enums"]["user_role"]
+          state?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
+          timezone?: string
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
+          city?: string | null
+          country?: string | null
           created_at?: string
           deleted_at?: string | null
           email?: string
+          experience_level?:
+            | Database["public"]["Enums"]["experience_level"]
+            | null
           full_name?: string
           id?: string
-          location?: string | null
+          is_seed?: boolean
+          languages?: string[]
           role?: Database["public"]["Enums"]["user_role"]
+          state?: string | null
           status?: Database["public"]["Enums"]["profile_status"]
+          timezone?: string
           updated_at?: string
         }
         Relationships: []
+      }
+      saved_matches: {
+        Row: {
+          actor_id: string
+          candidate_id: string
+          created_at: string
+          subject_id: string
+        }
+        Insert: {
+          actor_id: string
+          candidate_id: string
+          created_at?: string
+          subject_id: string
+        }
+        Update: {
+          actor_id?: string
+          candidate_id?: string
+          created_at?: string
+          subject_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_matches_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_matches_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_matches_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      topics: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "topics_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      activate_profile: { Args: never; Returns: undefined }
+      is_active_member: { Args: never; Returns: boolean }
+      is_active_profile: { Args: { p_id: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       is_super_admin: { Args: never; Returns: boolean }
+      match_document_chunks: {
+        Args: {
+          match_count?: number
+          min_similarity?: number
+          query_embedding: string
+        }
+        Returns: {
+          chunk_id: string
+          content: string
+          document_id: string
+          document_title: string
+          page_number: number
+          similarity: number
+        }[]
+      }
+      set_profile_topics: {
+        Args: {
+          p_goals?: string[]
+          p_interests?: string[]
+          p_skills?: string[]
+        }
+        Returns: undefined
+      }
+      slugify_topic: { Args: { input: string }; Returns: string }
     }
     Enums: {
+      document_status: "uploaded" | "processing" | "ready" | "failed"
+      experience_level: "student" | "junior" | "mid" | "senior" | "lead"
+      match_action: "viewed" | "saved" | "unsaved" | "dismissed"
       profile_status: "active" | "inactive"
+      topic_relation: "skill" | "goal" | "interest"
       user_role: "super_admin" | "admin" | "mentor" | "mentee"
     }
     CompositeTypes: {
@@ -195,7 +537,11 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      document_status: ["uploaded", "processing", "ready", "failed"],
+      experience_level: ["student", "junior", "mid", "senior", "lead"],
+      match_action: ["viewed", "saved", "unsaved", "dismissed"],
       profile_status: ["active", "inactive"],
+      topic_relation: ["skill", "goal", "interest"],
       user_role: ["super_admin", "admin", "mentor", "mentee"],
     },
   },
