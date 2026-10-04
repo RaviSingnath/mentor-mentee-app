@@ -14,7 +14,12 @@ import { cn } from "@/lib/utils";
 import { Mailbox, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import LogoutButton from "@/components/logout";
+import { useAuth } from "@/lib/context/AuthProvider";
+import UserRole, { UserRoleLabel } from "@/lib/rbac/roles";
 export default function ProfileSheet() {
+  const { user } = useAuth();
+  const userRole = user?.role as UserRole | undefined;
+
   return (
     <Sheet>
       {/* Trigger Button */}
@@ -52,13 +57,16 @@ export default function ProfileSheet() {
             </Avatar>
 
             <div className="text-center">
-              <h6 className="text-lg font-semibold">Cameron</h6>
+              <h6 className="text-lg font-semibold">{user?.full_name}</h6>
               <div className="flex items-center gap-2 justify-center">
                 <Mailbox size={18} className="text-muted-foreground" />
                 <span className="text-sm font-normal text-muted-foreground">
-                  info@shadcndashboard.com
+                  {user?.email}
                 </span>
               </div>
+              <span className="text-sm font-medium text-muted-foreground">
+                {userRole ? (UserRoleLabel[userRole] ?? "") : ""}
+              </span>
             </div>
           </div>
         </div>
