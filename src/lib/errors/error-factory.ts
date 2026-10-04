@@ -31,14 +31,6 @@ export const Errors = {
     );
   },
 
-  collegeNotAssigned() {
-    return new AppError(
-      "College association missing",
-      403,
-      ERROR_CODES.COLLEGE_NOT_ASSIGNED,
-    );
-  },
-
   inviteFailed(error: AuthError) {
     return new AppError(
       "A user with this email already exists.",

@@ -12,7 +12,7 @@ type SupabaseError = {
 export function mapSupabaseError(error: SupabaseError) {
   switch (error.code) {
     // Unique constraint violation
-    // Example: duplicate department name
+    // Example: duplicate name
     case "23505":
       return new AppError(
         "A record with this value already exists.",
@@ -21,7 +21,6 @@ export function mapSupabaseError(error: SupabaseError) {
       );
 
     // Foreign key violation
-    // Example: deleting college that has departments
     case "23503":
       return new AppError(
         "This record cannot be deleted because it is still in use.",

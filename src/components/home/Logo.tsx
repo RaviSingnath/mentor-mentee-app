@@ -10,7 +10,7 @@ export function Logo(props: React.ComponentPropsWithoutRef<"svg">) {
       src="/logo/logo.svg"
       width={48}
       height={48}
-      alt="College Diary"
+      alt="Mentor Mentee"
       className="h-auto w-16"
     />
   );

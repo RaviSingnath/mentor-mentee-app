@@ -1,11 +1,26 @@
 "use server";
 
-import { TSignUp, zSignUp, TLogin, zLogin } from "@/features/auth/auth.schema";
+import { revalidatePath } from "next/cache";
+
+import {
+  TSignUp,
+  zSignUp,
+  TLogin,
+  zLogin,
+  zInviteAdmin,
+  TInviteAdmin,
+} from "@/features/auth/auth.schema";
 import { ERROR_CODES } from "@/lib/errors/error-codes";
 import { handleError } from "@/lib/errors/handle-error";
 import { getZodFieldErrors } from "@/lib/helper/get-zod-field-errors";
 import { ActionResponse } from "@/lib/types/action-response";
-import { loginService, logoutService, signUpService } from "./auth.services";
+import {
+  inviteAdminService,
+  loginService,
+  logoutService,
+  signUpService,
+} from "./auth.services";
+import { createRequestContext } from "@/lib/auth/request-context";
 
 export async function signUpAction(formData: TSignUp): Promise<ActionResponse> {
   const validatedFields = zSignUp.safeParse(formData);
@@ -76,3 +91,36 @@ export async function logoutAction() {
     };
   }
 }
+
+export const inviteAdminAction = async (
+  data: TInviteAdmin,
+): Promise<ActionResponse> => {
+  try {
+    const ctx = await createRequestContext();
+
+    const validatedFields = zInviteAdmin.safeParse(data);
+
+    if (!validatedFields.success) {
+      return {
+        success: false,
+        code: ERROR_CODES.VALIDATION_ERROR,
+        message: "Validation failed",
+        errors: getZodFieldErrors(validatedFields.error),
+      };
+    }
+
+    const admin = await inviteAdminService({
+      ctx,
+      data: validatedFields.data,
+    });
+
+    revalidatePath("/dashboard", "page");
+
+    return {
+      success: true,
+      data: admin,
+    };
+  } catch (error) {
+    return handleError(error);
+  }
+};

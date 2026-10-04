@@ -1,6 +1,21 @@
 import * as z from "zod";
 import UserRole from "@/lib/rbac/roles";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Target role
+//
+// Roles that can be invited. super_admin is excluded — that account
+// is provisioned directly, never via invitation.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const InviteTargetRole = z.enum([
+  UserRole.ADMIN,
+  UserRole.MENTOR,
+  UserRole.MENTEE,
+]);
+
+export type InviteTargetRole = z.infer<typeof InviteTargetRole>;
+
 export const zSignUp = z
   .object({
     full_name: z.string().trim().min(1, "Full name is required"),
@@ -30,3 +45,26 @@ export const zLogin = z.object({
 });
 
 export type TLogin = z.infer<typeof zLogin>;
+
+export const zInviteAdmin = z.object({
+  full_name: z.string().trim().min(1, "Full name is required"),
+  invite_email: z
+    .email({ error: "Enter a valid email address" })
+    .trim()
+    .toLowerCase(),
+  target_role: z.literal(UserRole.MENTEE),
+});
+
+export type TInviteAdmin = z.infer<typeof zInviteAdmin>;
+
+export const zAcceptInvite = z
+  .object({
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirm_password: z.string(),
+  })
+  .refine((data) => data.password === data.confirm_password, {
+    message: "Passwords don't match",
+    path: ["confirm_password"], // Sets the error on the confirmPassword field
+  });
+
+export type TAcceptInvite = z.infer<typeof zAcceptInvite>;

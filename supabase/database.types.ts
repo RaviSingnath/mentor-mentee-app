@@ -143,6 +143,105 @@ export type Database = {
           },
         ]
       }
+      invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          created_user_id: string | null
+          deleted_at: string | null
+          deleted_by: string | null
+          email: string
+          expires_at: string
+          full_name: string
+          id: string
+          invited_by: string
+          revoked_at: string | null
+          revoked_by: string | null
+          revoked_reason: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          status: Database["public"]["Enums"]["invitation_status"]
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          created_user_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          email: string
+          expires_at: string
+          full_name: string
+          id?: string
+          invited_by: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          revoked_reason?: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          created_user_id?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
+          email?: string
+          expires_at?: string
+          full_name?: string
+          id?: string
+          invited_by?: string
+          revoked_at?: string | null
+          revoked_by?: string | null
+          revoked_reason?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          status?: Database["public"]["Enums"]["invitation_status"]
+          token?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invitations_accepted_by_fkey"
+            columns: ["accepted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_created_user_id_fkey"
+            columns: ["created_user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_deleted_by_fkey"
+            columns: ["deleted_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invitations_revoked_by_fkey"
+            columns: ["revoked_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_interactions: {
         Row: {
           action: Database["public"]["Enums"]["match_action"]
@@ -235,6 +334,7 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string
+          created_by: string | null
           deleted_at: string | null
           email: string
           experience_level:
@@ -256,6 +356,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          created_by?: string | null
           deleted_at?: string | null
           email: string
           experience_level?:
@@ -277,6 +378,7 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string
+          created_by?: string | null
           deleted_at?: string | null
           email?: string
           experience_level?:
@@ -292,7 +394,15 @@ export type Database = {
           timezone?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       saved_matches: {
         Row: {
@@ -406,6 +516,12 @@ export type Database = {
     Enums: {
       document_status: "uploaded" | "processing" | "ready" | "failed"
       experience_level: "student" | "junior" | "mid" | "senior" | "lead"
+      invitation_status:
+        | "pending"
+        | "accepted"
+        | "expired"
+        | "revoked"
+        | "cancelled"
       match_action: "viewed" | "saved" | "unsaved" | "dismissed"
       profile_status: "active" | "inactive"
       topic_relation: "skill" | "goal" | "interest"
@@ -539,6 +655,13 @@ export const Constants = {
     Enums: {
       document_status: ["uploaded", "processing", "ready", "failed"],
       experience_level: ["student", "junior", "mid", "senior", "lead"],
+      invitation_status: [
+        "pending",
+        "accepted",
+        "expired",
+        "revoked",
+        "cancelled",
+      ],
       match_action: ["viewed", "saved", "unsaved", "dismissed"],
       profile_status: ["active", "inactive"],
       topic_relation: ["skill", "goal", "interest"],

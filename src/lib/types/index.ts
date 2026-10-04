@@ -6,8 +6,6 @@ export type UserContext = User & {
   email?: string | null;
 
   role: UserRole;
-  collegeId?: string | null;
-  departmentId?: string | null;
 
   isActive?: boolean;
 

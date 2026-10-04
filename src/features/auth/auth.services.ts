@@ -1,12 +1,25 @@
-import { TSignUp, zSignUp, TLogin, zLogin } from "@/features/auth/auth.schema";
+import { TSignUp, TLogin, TInviteAdmin } from "@/features/auth/auth.schema";
 import createClient from "../../../supabase/server";
+import { RequestContext } from "@/lib/auth/request-context";
+import { createAdminClient } from "../../../supabase/admin";
+import { assertCanInvite } from "./security/invite.create.security";
+import { getInviteByEmail } from "../invite/invite.queries";
+import { Errors } from "@/lib/errors/error-factory";
+import {
+  cancelOlderInviteByEmail,
+  createInvite,
+} from "../invite/invite.mutations";
+import { mapSupabaseError } from "@/lib/errors/supabase-error";
+import { generateToken } from "@/lib/helper/generate-token";
+import { mapSupabaseAuthError } from "@/lib/errors/supabase-auth-error";
+import { InvitationInsert } from "../invite/invite.types";
+import { getExpiresAtDate } from "@/lib/helper/date";
 
 type signupServiceInput = {
   data: TSignUp;
 };
 
 export async function signUpService({ data }: signupServiceInput) {
-  console.log("signUpService: ", data);
   const supabase = await createClient();
 
   const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`;
@@ -22,8 +35,6 @@ export async function signUpService({ data }: signupServiceInput) {
       emailRedirectTo: redirectUrl,
     },
   });
-
-  console.log(error);
 
   if (error) {
     throw new Error("Error occured while singing in.");
@@ -62,4 +73,79 @@ export async function logoutService(): Promise<null> {
   }
 
   return null;
+}
+
+type InviteUserServiceInput = {
+  ctx: RequestContext;
+  data: TInviteAdmin;
+};
+
+export async function inviteAdminService({
+  ctx,
+  data,
+}: InviteUserServiceInput) {
+  const supabaseAdmin = createAdminClient();
+
+  // 1. Permission + scope check
+  await assertCanInvite(ctx, data);
+
+  // 2. Duplicate check
+  const { data: existingInvite } = await getInviteByEmail(data.invite_email);
+
+  if (existingInvite) {
+    throw Errors.alreadyExists("Invitation");
+  }
+
+  // 3. Cancel any older active invite for this email (allows re-invite)
+  const { error: cancelError } = await cancelOlderInviteByEmail(
+    data.invite_email,
+  );
+
+  if (cancelError) {
+    throw mapSupabaseError(cancelError);
+  }
+
+  // 4. Generate invite token + URL
+  const token = generateToken();
+  const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/accept-invite?token=${token}`;
+
+  // 5. Send via Supabase auth (uncomment when email is ready)
+  const { data: invitedUserData, error: authInviteError } =
+    await supabaseAdmin.auth.admin.inviteUserByEmail(data.invite_email, {
+      redirectTo: inviteUrl,
+      data: {
+        full_name: data.full_name,
+        role: data.target_role,
+      },
+    });
+
+  if (authInviteError) throw mapSupabaseAuthError(authInviteError);
+
+  const { error: roleError } = await supabaseAdmin
+    .from("profiles")
+    .update({ role: "admin" })
+    .eq("id", invitedUserData.user.id);
+
+  if (roleError) {
+    await supabaseAdmin.auth.admin.deleteUser(invitedUserData.user.id); // don't leave a half-created user
+    throw roleError;
+  }
+
+  // 6. Insert invitation row
+  const inviteData: InvitationInsert = {
+    email: data.invite_email,
+    full_name: data.full_name,
+    role: data.target_role,
+    token,
+    invited_by: ctx.user.id,
+    expires_at: getExpiresAtDate(),
+  };
+
+  const { data: invitation, error } = await createInvite(inviteData);
+
+  if (error) {
+    throw mapSupabaseError(error);
+  }
+
+  return invitation;
 }
