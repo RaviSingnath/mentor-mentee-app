@@ -7,92 +7,28 @@
  * Score = sum of weight * value for six signals, where each value is in [0, 1].
  * Every signal also returns a human-readable reason, so each match can be explained.
  */
-import { overlapMinutes, toUtcWeekIntervals, type AvailabilitySlot } from "./availability";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-export const EXPERIENCE_LEVELS = ["student", "junior", "mid", "senior", "lead"] as const;
-export type ExperienceLevel = (typeof EXPERIENCE_LEVELS)[number];
-
-export interface Topic {
-  slug: string;
-  name: string;
-}
-
-export interface MatchProfile {
-  id: string;
-  fullName: string;
-  role: "mentor" | "mentee";
-  experienceLevel: ExperienceLevel | null;
-  city: string | null;
-  state: string | null;
-  country: string | null;
-  timezone: string; // IANA, e.g. "Asia/Kolkata"
-  languages: string[]; // e.g. ["en", "hi"]
-  skills: Topic[]; // what the person can teach (mentors)
-  goals: Topic[]; // what the person wants to learn (mentees)
-  interests: Topic[];
-  availability: AvailabilitySlot[];
-}
+import { overlapMinutes, toUtcWeekIntervals } from "./availability";
+import {
+  DEFAULT_LIMIT,
+  EXPERIENCE_GAP_FIT,
+  EXPERIENCE_LEVELS,
+  FULL_OVERLAP_MINUTES,
+  SIGNAL_LABELS,
+  WEIGHTS,
+} from "./constants";
+import {
+  MatchProfile,
+  MatchResult,
+  RankOptions,
+  RawSignal,
+  SignalKey,
+  SignalResult,
+  Topic,
+} from "./types";
 
 // ---------------------------------------------------------------------------
 // Configuration: the only place weights live. Must sum to 100.
 // ---------------------------------------------------------------------------
-
-export const WEIGHTS = {
-  goalsSkills: 35,
-  availability: 20,
-  language: 15,
-  experience: 15,
-  interests: 10,
-  location: 5,
-} as const;
-
-export type SignalKey = keyof typeof WEIGHTS;
-
-const SIGNAL_LABELS: Record<SignalKey, string> = {
-  goalsSkills: "Skills vs. goals",
-  availability: "Availability",
-  language: "Language",
-  experience: "Experience fit",
-  interests: "Shared interests",
-  location: "Location",
-};
-
-/** Weekly overlap at which the availability signal reaches its maximum. */
-export const FULL_OVERLAP_MINUTES = 120;
-
-/** Mentor-minus-mentee experience gap -> fit. Best at 2 levels; peers and huge gaps score lower. */
-const EXPERIENCE_GAP_FIT: Record<number, number> = { 0: 0.3, 1: 0.8, 2: 1, 3: 0.85, 4: 0.7 };
-
-export const DEFAULT_LIMIT = 5;
-
-// ---------------------------------------------------------------------------
-// Result types
-// ---------------------------------------------------------------------------
-
-export interface SignalResult {
-  key: SignalKey;
-  label: string;
-  weight: number;
-  value: number; // 0..1
-  points: number; // weight * value
-  reason: string;
-}
-
-export interface MatchResult {
-  profile: MatchProfile; // the counterpart being recommended
-  score: number; // 0..100, one decimal
-  signals: SignalResult[];
-  reasons: string[]; // 2-3 human-readable reasons, strongest first
-}
-
-interface RawSignal {
-  value: number;
-  reason: string;
-}
 
 // ---------------------------------------------------------------------------
 // Small helpers
@@ -131,14 +67,20 @@ function formatDuration(minutes: number): string {
 // Signals (each takes the pair as mentee, mentor)
 // ---------------------------------------------------------------------------
 
-function goalsSkillsSignal(mentee: MatchProfile, mentor: MatchProfile): RawSignal {
+function goalsSkillsSignal(
+  mentee: MatchProfile,
+  mentor: MatchProfile,
+): RawSignal {
   const goals = mentee.goals;
   if (goals.length === 0) {
     return { value: 0, reason: "The mentee has not listed any learning goals" };
   }
   const hits = intersectTopics(goals, mentor.skills);
   if (hits.length === 0) {
-    return { value: 0, reason: `None of the mentee's ${plural(goals.length, "goal")} match the mentor's skills` };
+    return {
+      value: 0,
+      reason: `None of the mentee's ${plural(goals.length, "goal")} match the mentor's skills`,
+    };
   }
   return {
     value: hits.length / goals.length,
@@ -146,15 +88,23 @@ function goalsSkillsSignal(mentee: MatchProfile, mentor: MatchProfile): RawSigna
   };
 }
 
-function availabilitySignal(mentee: MatchProfile, mentor: MatchProfile, now: Date): RawSignal {
+function availabilitySignal(
+  mentee: MatchProfile,
+  mentor: MatchProfile,
+  now: Date,
+): RawSignal {
   if (mentee.availability.length === 0 || mentor.availability.length === 0) {
-    return { value: 0, reason: "Availability has not been provided for both people" };
+    return {
+      value: 0,
+      reason: "Availability has not been provided for both people",
+    };
   }
   const minutes = overlapMinutes(
     toUtcWeekIntervals(mentee.availability, mentee.timezone, now),
     toUtcWeekIntervals(mentor.availability, mentor.timezone, now),
   );
-  if (minutes === 0) return { value: 0, reason: "No overlapping weekly availability" };
+  if (minutes === 0)
+    return { value: 0, reason: "No overlapping weekly availability" };
   return {
     value: Math.min(1, minutes / FULL_OVERLAP_MINUTES),
     reason: `About ${formatDuration(minutes)} of overlapping weekly availability`,
@@ -163,25 +113,47 @@ function availabilitySignal(mentee: MatchProfile, mentor: MatchProfile, now: Dat
 
 function languageSignal(mentee: MatchProfile, mentor: MatchProfile): RawSignal {
   if (mentee.languages.length === 0 || mentor.languages.length === 0) {
-    return { value: 0, reason: "Languages have not been provided for both people" };
+    return {
+      value: 0,
+      reason: "Languages have not been provided for both people",
+    };
   }
   const mentorLangs = new Set(mentor.languages.map(norm));
-  const shared = [...new Set(mentee.languages.map(norm))].filter((l) => mentorLangs.has(l));
+  const shared = [...new Set(mentee.languages.map(norm))].filter((l) =>
+    mentorLangs.has(l),
+  );
   if (shared.length === 0) return { value: 0, reason: "No shared language" };
-  return { value: 1, reason: `Shared ${shared.length === 1 ? "language" : "languages"}: ${shared.map(languageName).join(", ")}` };
+  return {
+    value: 1,
+    reason: `Shared ${shared.length === 1 ? "language" : "languages"}: ${shared.map(languageName).join(", ")}`,
+  };
 }
 
-function experienceSignal(mentee: MatchProfile, mentor: MatchProfile): RawSignal {
+function experienceSignal(
+  mentee: MatchProfile,
+  mentor: MatchProfile,
+): RawSignal {
   if (!mentee.experienceLevel || !mentor.experienceLevel) {
-    return { value: 0, reason: "Experience level has not been provided for both people" };
+    return {
+      value: 0,
+      reason: "Experience level has not been provided for both people",
+    };
   }
-  const gap = EXPERIENCE_LEVELS.indexOf(mentor.experienceLevel) - EXPERIENCE_LEVELS.indexOf(mentee.experienceLevel);
+  const gap =
+    EXPERIENCE_LEVELS.indexOf(mentor.experienceLevel) -
+    EXPERIENCE_LEVELS.indexOf(mentee.experienceLevel);
   if (gap < 0) {
-    return { value: 0, reason: `Mentor (${mentor.experienceLevel}) is less experienced than the mentee (${mentee.experienceLevel})` };
+    return {
+      value: 0,
+      reason: `Mentor (${mentor.experienceLevel}) is less experienced than the mentee (${mentee.experienceLevel})`,
+    };
   }
   const value = EXPERIENCE_GAP_FIT[Math.min(gap, 4)];
   if (gap === 0) {
-    return { value, reason: `Same experience level (${mentor.experienceLevel}), so more of a peer than a mentor` };
+    return {
+      value,
+      reason: `Same experience level (${mentor.experienceLevel}), so more of a peer than a mentor`,
+    };
   }
   return {
     value,
@@ -189,37 +161,56 @@ function experienceSignal(mentee: MatchProfile, mentor: MatchProfile): RawSignal
   };
 }
 
-function interestsSignal(mentee: MatchProfile, mentor: MatchProfile): RawSignal {
+function interestsSignal(
+  mentee: MatchProfile,
+  mentor: MatchProfile,
+): RawSignal {
   if (mentee.interests.length === 0 || mentor.interests.length === 0) {
-    return { value: 0, reason: "Interests have not been provided for both people" };
+    return {
+      value: 0,
+      reason: "Interests have not been provided for both people",
+    };
   }
   const shared = intersectTopics(mentee.interests, mentor.interests);
   if (shared.length === 0) return { value: 0, reason: "No shared interests" };
   // overlap coefficient: a small interest list is not penalised against a large one
   return {
-    value: shared.length / Math.min(mentee.interests.length, mentor.interests.length),
+    value:
+      shared.length /
+      Math.min(mentee.interests.length, mentor.interests.length),
     reason: `Shared ${shared.length === 1 ? "interest" : "interests"}: ${listNames(shared.map((t) => t.name))}`,
   };
 }
 
 function locationSignal(mentee: MatchProfile, mentor: MatchProfile): RawSignal {
-  const hasLocation = (p: MatchProfile) => norm(p.city) !== "" || norm(p.state) !== "" || norm(p.country) !== "";
+  const hasLocation = (p: MatchProfile) =>
+    norm(p.city) !== "" || norm(p.state) !== "" || norm(p.country) !== "";
   if (!hasLocation(mentee) || !hasLocation(mentor)) {
-    return { value: 0, reason: "Location has not been provided for both people" };
+    return {
+      value: 0,
+      reason: "Location has not been provided for both people",
+    };
   }
 
-  const same = (a: string | null, b: string | null) => norm(a) !== "" && norm(a) === norm(b);
+  const same = (a: string | null, b: string | null) =>
+    norm(a) !== "" && norm(a) === norm(b);
   // A level only has to agree when both people filled it in (so "Springfield, IL" never matches "Springfield, MO").
-  const compatible = (a: string | null, b: string | null) => norm(a) === "" || norm(b) === "" || norm(a) === norm(b);
+  const compatible = (a: string | null, b: string | null) =>
+    norm(a) === "" || norm(b) === "" || norm(a) === norm(b);
 
   const sameCountry = same(mentee.country, mentor.country);
-  const sameState = same(mentee.state, mentor.state) && compatible(mentee.country, mentor.country);
+  const sameState =
+    same(mentee.state, mentor.state) &&
+    compatible(mentee.country, mentor.country);
   const sameCity =
-    same(mentee.city, mentor.city) && compatible(mentee.state, mentor.state) && compatible(mentee.country, mentor.country);
+    same(mentee.city, mentor.city) &&
+    compatible(mentee.state, mentor.state) &&
+    compatible(mentee.country, mentor.country);
 
   if (sameCity) return { value: 1, reason: `Both are in ${mentee.city}` };
   if (sameState) return { value: 0.75, reason: `Both are in ${mentee.state}` };
-  if (sameCountry) return { value: 0.5, reason: `Both are in ${mentee.country}` };
+  if (sameCountry)
+    return { value: 0.5, reason: `Both are in ${mentee.country}` };
   return { value: 0, reason: "Located in different places" };
 }
 
@@ -229,9 +220,15 @@ function locationSignal(mentee: MatchProfile, mentor: MatchProfile): RawSignal {
 
 /** Pick 2-3 reasons: strongest contributions first, topped up with the most important gaps. */
 export function pickReasons(signals: SignalResult[], count = 3): string[] {
-  const positive = signals.filter((s) => s.points > 0).sort((a, b) => b.points - a.points);
-  const gaps = signals.filter((s) => s.points <= 0).sort((a, b) => b.weight - a.weight);
-  return [...positive, ...gaps].slice(0, Math.max(2, count)).map((s) => s.reason);
+  const positive = signals
+    .filter((s) => s.points > 0)
+    .sort((a, b) => b.points - a.points);
+  const gaps = signals
+    .filter((s) => s.points <= 0)
+    .sort((a, b) => b.weight - a.weight);
+  return [...positive, ...gaps]
+    .slice(0, Math.max(2, count))
+    .map((s) => s.reason);
 }
 
 /** Score one (mentee, mentor) pair. The pair is symmetric, so it serves both viewing directions. */
@@ -249,23 +246,23 @@ export function scorePair(
     location: locationSignal(mentee, mentor),
   };
 
-  const signals = (Object.keys(WEIGHTS) as SignalKey[]).map((key): SignalResult => ({
-    key,
-    label: SIGNAL_LABELS[key],
-    weight: WEIGHTS[key],
-    value: raw[key].value,
-    points: round1(WEIGHTS[key] * raw[key].value),
-    reason: raw[key].reason,
-  }));
+  const signals = (Object.keys(WEIGHTS) as SignalKey[]).map(
+    (key): SignalResult => ({
+      key,
+      label: SIGNAL_LABELS[key],
+      weight: WEIGHTS[key],
+      value: raw[key].value,
+      points: round1(WEIGHTS[key] * raw[key].value),
+      reason: raw[key].reason,
+    }),
+  );
 
-  const total = (Object.keys(WEIGHTS) as SignalKey[]).reduce((sum, key) => sum + WEIGHTS[key] * raw[key].value, 0);
+  const total = (Object.keys(WEIGHTS) as SignalKey[]).reduce(
+    (sum, key) => sum + WEIGHTS[key] * raw[key].value,
+    0,
+  );
 
   return { score: round1(total), signals, reasons: pickReasons(signals) };
-}
-
-export interface RankOptions {
-  limit?: number; // default 5
-  now?: Date; // reference instant for timezone offsets (useful in tests)
 }
 
 /**
@@ -274,14 +271,21 @@ export interface RankOptions {
  * Always returns up to `limit` results, however low the scores are.
  * Ties break on name, then id, so output is deterministic.
  */
-export function rankMatches(subject: MatchProfile, pool: MatchProfile[], options: RankOptions = {}): MatchResult[] {
+export function rankMatches(
+  subject: MatchProfile,
+  pool: MatchProfile[],
+  options: RankOptions = {},
+): MatchResult[] {
   const { limit = DEFAULT_LIMIT, now = new Date() } = options;
   const wanted = subject.role === "mentee" ? "mentor" : "mentee";
 
   return pool
     .filter((p) => p.role === wanted && p.id !== subject.id)
     .map((p): MatchResult => {
-      const pair = subject.role === "mentee" ? scorePair(subject, p, now) : scorePair(p, subject, now);
+      const pair =
+        subject.role === "mentee"
+          ? scorePair(subject, p, now)
+          : scorePair(p, subject, now);
       return { profile: p, ...pair };
     })
     .sort(

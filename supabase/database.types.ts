@@ -503,6 +503,7 @@ export type Database = {
           similarity: number
         }[]
       }
+      match_pool: { Args: never; Returns: Json }
       normalize_tags: {
         Args: { p_goals: string[]; p_interests: string[]; p_skills: string[] }
         Returns: {

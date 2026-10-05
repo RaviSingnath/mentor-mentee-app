@@ -6,13 +6,9 @@
  * and intersect the intervals.
  */
 
-export interface AvailabilitySlot {
-  weekday: number; // 0 = Sunday ... 6 = Saturday
-  start: string; // "HH:MM" or "HH:MM:SS", local to the profile's timezone
-  end: string;
-}
+import { AvailabilitySlot, Interval } from "./types";
 
-export type Interval = [start: number, end: number];
+
 
 const MINUTES_PER_DAY = 24 * 60;
 const MINUTES_PER_WEEK = 7 * MINUTES_PER_DAY;
