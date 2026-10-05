@@ -13,6 +13,7 @@
     "@base-ui/react": "^1.8.0",
     "@google/genai": "^2.25.0",
     "@hookform/resolvers": "^5.9.1",
+    "@iconify/react": "^6.0.2",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.117.2",
     "class-variance-authority": "^0.7.1",

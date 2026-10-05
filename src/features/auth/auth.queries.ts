@@ -14,7 +14,14 @@ export const getCurrentUserQuery = async (userID: string) => {
       full_name,
       email,
       role,
-      status
+      status,
+      city,
+      state,
+      country,
+      experience_level,
+      timezone,
+      languages,
+      is_seed
     `,
     )
     .eq("id", userID)
