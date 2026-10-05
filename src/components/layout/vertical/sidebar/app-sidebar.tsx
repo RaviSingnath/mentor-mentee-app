@@ -10,13 +10,12 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import FullLogo from "../../shared/logo/full-logo";
-import sidebaritems from "./sidebaritems";
+import sidebaritems, { MenuItem } from "./sidebaritems";
 import NavCollapse from "./nav-collapse";
 import SimpleBar from "simplebar-react";
-import { NavSecondary } from "./nav-secondary";
-import { NavUser } from "./nav-user";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import UserRole from "@/lib/rbac/roles";
+import { useAuth } from "@/lib/context/AuthProvider";
 
 function NavSkeleton() {
   return (
@@ -33,6 +32,11 @@ function NavSkeleton() {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth();
+  const userRole = (user?.role as UserRole) || undefined;
+
+  const navItems: MenuItem[] | [] = userRole ? sidebaritems[userRole] : [];
+
   return (
     <Sidebar
       variant="inset"
@@ -52,7 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <div className="px-0 group-data-[state=collapsed]:px-0 w-full flex flex-col gap-4">
               {/* usePathname suspends under Cache Components when dynamic params are unknown */}
               <Suspense fallback={<NavSkeleton />}>
-                <NavCollapse menu={sidebaritems} className="text-sm" />
+                <NavCollapse menu={navItems} className="text-sm" />
               </Suspense>
             </div>
           </SidebarGroup>

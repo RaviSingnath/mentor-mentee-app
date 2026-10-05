@@ -34,77 +34,126 @@ export interface MenuItem {
   isPro?: boolean;
 }
 
+import UserRole from "@/lib/rbac/roles";
 import { uniqueId } from "lodash";
 
 import {
-  BarChart3,
-  Banknote,
-  BookOpen,
-  CreditCard,
-  FileText,
-  Files,
-  HelpCircle,
-  Key,
-  Lock,
-  LogIn,
   LucideIcon,
-  PieChart,
-  Plug,
-  ScanLine,
-  Settings,
-  ShieldCheck,
-  Table,
-  Tag,
-  Ticket,
-  Unlink,
-  UserPlus,
-  Smile,
   House,
-  NotebookText,
-  Component,
-  Table2,
-  Form,
   CircleUserRound,
-  Sparkles,
-  Calendar,
-  MessageCircle,
-  Mail,
-  Contact,
-  Receipt,
-  UserCircle,
-  ShoppingBag,
-  List,
-  Users,
-  Package,
-  ChartBar,
-  ShoppingCart,
-  GraduationCap,
-  HeartPulse,
+  Upload,
+  UserGroup,
 } from "lucide-react";
 
-const SidebarContent: MenuItem[] = [
-  {
-    heading: "Dashboard",
-    items: [
-      {
-        id: uniqueId(),
-        name: "Home",
-        icon: House,
-        url: "/dashboard",
-      },
-    ],
-  },
-  {
-    heading: "Pages",
-    items: [
-      {
-        id: uniqueId(),
-        name: "User Profile",
-        icon: CircleUserRound,
-        url: "/profile",
-      },
-    ],
-  },
-];
+export const SidebarContent: Record<UserRole, MenuItem[]> = {
+  [UserRole.SUPER_ADMIN]: [
+    {
+      heading: "Dashboard",
+      items: [
+        {
+          id: uniqueId(),
+          name: "Home",
+          icon: House,
+          url: "/dashboard",
+        },
+      ],
+    },
+    {
+      heading: "Pages",
+      items: [
+        {
+          id: uniqueId(),
+          name: "Seed Data",
+          icon: Upload,
+          url: "/seed",
+        },
+        {
+          id: uniqueId(),
+          name: "Matches",
+          icon: UserGroup,
+          url: "/matches",
+        },
+      ],
+    },
+  ],
+  [UserRole.ADMIN]: [
+    {
+      heading: "Dashboard",
+      items: [
+        {
+          id: uniqueId(),
+          name: "Home",
+          icon: House,
+          url: "/dashboard",
+        },
+      ],
+    },
+    {
+      heading: "Pages",
+      items: [
+        {
+          id: uniqueId(),
+          name: "Seed Data",
+          icon: Upload,
+          url: "/seed",
+        },
+        {
+          id: uniqueId(),
+          name: "Matches",
+          icon: UserGroup,
+          url: "/matches",
+        },
+      ],
+    },
+  ],
+  [UserRole.MENTOR]: [
+    {
+      heading: "Dashboard",
+      items: [
+        {
+          id: uniqueId(),
+          name: "Home",
+          icon: House,
+          url: "/dashboard",
+        },
+      ],
+    },
+    {
+      heading: "Pages",
+      items: [
+        {
+          id: uniqueId(),
+          name: "Profile",
+          icon: CircleUserRound,
+          url: "/profile",
+        },
+      ],
+    },
+  ],
+  [UserRole.MENTEE]: [
+    {
+      heading: "Dashboard",
+      items: [
+        {
+          id: uniqueId(),
+          name: "Home",
+          icon: House,
+          url: "/dashboard",
+        },
+      ],
+    },
+    {
+      heading: "Pages",
+      items: [
+        {
+          id: uniqueId(),
+          name: "Profile",
+          icon: CircleUserRound,
+          url: "/profile",
+        },
+      ],
+    },
+  ],
+};
 
 export default SidebarContent;
