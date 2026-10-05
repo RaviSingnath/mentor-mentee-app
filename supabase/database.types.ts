@@ -503,6 +503,24 @@ export type Database = {
           similarity: number
         }[]
       }
+      normalize_tags: {
+        Args: { p_goals: string[]; p_interests: string[]; p_skills: string[] }
+        Returns: {
+          tag_name: string
+          tag_relation: Database["public"]["Enums"]["topic_relation"]
+          tag_slug: string
+        }[]
+      }
+      purge_seed_users: { Args: never; Returns: number }
+      replace_profile_topics: {
+        Args: {
+          p_goals?: string[]
+          p_interests?: string[]
+          p_profile_id: string
+          p_skills?: string[]
+        }
+        Returns: undefined
+      }
       set_profile_topics: {
         Args: {
           p_goals?: string[]
