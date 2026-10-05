@@ -1,8 +1,14 @@
 "use server";
 
-import { getMatchPoolQuery, isActiveMemberQuery } from "./matches.queries";
+import {
+  getCandidatesProfileQuery,
+  getMatchPoolQuery,
+  getSavedMatchesQuery,
+  isActiveMemberQuery,
+} from "./matches.queries";
 import createClient from "../../../supabase/server";
 import { mapSupabaseError } from "@/lib/errors/supabase-error";
+import { createRequestContext } from "@/lib/auth/request-context";
 
 export async function isActiveMemberService() {
   const { data: isMember, error } = await isActiveMemberQuery();
@@ -31,3 +37,32 @@ export async function getMatchPoolService() {
 
   return { data: data };
 }
+
+export async function getSavedMatchesService() {
+  const ctx = await createRequestContext();
+
+  const userId = ctx.user.id;
+
+  const { data, error } = await getSavedMatchesQuery(userId, userId);
+
+  if (error) {
+    throw mapSupabaseError(error);
+  }
+  const candidatesId = new Set(
+    (data ?? []).map((r: { candidate_id: string }) => r.candidate_id),
+  );
+
+  const { data: candidates, error: candidatesError } =
+    await getCandidatesProfileQuery([...candidatesId]);
+
+  if (candidatesError) {
+    throw mapSupabaseError(candidatesError);
+  }
+
+  return candidates;
+}
+
+type CandidatesListResponse = Awaited<
+  ReturnType<typeof getSavedMatchesService>
+>;
+export type CandidatesListItem = CandidatesListResponse[number];

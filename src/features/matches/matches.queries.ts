@@ -40,3 +40,24 @@ export async function getMatchPoolQuery() {
 
   return supabase.rpc("match_pool");
 }
+
+export async function getCandidatesProfileQuery(
+  candidatesId: string[],
+) {
+  const supabase = await createClient();
+
+  return supabase
+    .from("profiles")
+    .select(
+      `
+      id,
+      full_name,
+      role,
+      experience_level,
+      city,
+      state,
+      country
+      `,
+    )
+    .in("id", candidatesId);
+}
