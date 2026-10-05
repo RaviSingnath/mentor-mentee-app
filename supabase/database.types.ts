@@ -484,6 +484,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      custom_access_token_hook: { Args: { event: Json }; Returns: Json }
       is_active_member: { Args: never; Returns: boolean }
       is_active_profile: { Args: { p_id: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
