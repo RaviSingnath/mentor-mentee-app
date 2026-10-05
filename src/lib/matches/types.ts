@@ -40,7 +40,9 @@ export interface InteractionRow {
 export interface BuildArgs {
   pool: PoolProfile[];
   viewerId: string;
-  /** Whom to find matches for. null = the viewer's own profile, if they have one. */
+  /** Only admins and super admins may look at someone else's matches or see the list of people. */
+  isAdmin: boolean;
+  /** Whom to find matches for. null = the viewer's own profile, if they have one. Ignored unless isAdmin. */
   subjectId: string | null;
   saved: Set<string>;
   dismissed: Set<string>;

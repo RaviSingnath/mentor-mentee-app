@@ -61,27 +61,31 @@ export function dismissedCandidates(rows: InteractionRow[]): Set<string> {
 export function buildMatchView({
   pool,
   viewerId,
+  isAdmin,
   subjectId,
   saved,
   dismissed,
   limit = DEFAULT_LIMIT,
   now,
 }: BuildArgs): MatchView {
-  const subjectOptions: SubjectOption[] = [...pool]
-    .sort(
-      (a, b) =>
-        a.role.localeCompare(b.role) || a.fullName.localeCompare(b.fullName),
-    )
-    .map((p) => ({
-      id: p.id,
-      role: p.role,
-      label: p.city
-        ? `${p.fullName} (${p.city}) - ${UserRoleLabel[p.role]}`
-        : p.fullName,
-    }));
+  // Non-admins never receive the list of other people, so it cannot leak through the page payload.
+  const subjectOptions: SubjectOption[] = isAdmin
+    ? [...pool]
+        .sort(
+          (a, b) =>
+            a.role.localeCompare(b.role) ||
+            a.fullName.localeCompare(b.fullName),
+        )
+        .map((p) => ({
+          id: p.id,
+          role: p.role,
+          label: p.city ? `${p.fullName} (${p.city})` : p.fullName,
+        }))
+    : [];
 
+  const requestedId = isAdmin ? subjectId : null;
   const effectiveId =
-    subjectId ?? (pool.some((p) => p.id === viewerId) ? viewerId : null);
+    requestedId ?? (pool.some((p) => p.id === viewerId) ? viewerId : null);
   const subject = effectiveId
     ? pool.find((p) => p.id === effectiveId)
     : undefined;
@@ -114,10 +118,14 @@ export function buildMatchView({
 // ---------------------------------------------------------------------------
 export async function getMatchView(args: {
   viewerId: string;
+  isAdmin: boolean;
   subjectParam: string | null;
   now?: Date;
 }): Promise<MatchView> {
-  const { viewerId, subjectParam, now } = args;
+  const { viewerId, isAdmin, now } = args;
+
+  const subjectParam = isAdmin ? args.subjectParam : null; // members can only ever see their own matches
+
   const pool = await loadMatchPool();
 
   const subjectId =
@@ -126,6 +134,7 @@ export async function getMatchView(args: {
     return buildMatchView({
       pool,
       viewerId,
+      isAdmin,
       subjectId: null,
       saved: new Set(),
       dismissed: new Set(),
@@ -147,6 +156,7 @@ export async function getMatchView(args: {
   return buildMatchView({
     pool,
     viewerId,
+    isAdmin,
     subjectId,
     saved: new Set(
       (savedRows.data ?? []).map(

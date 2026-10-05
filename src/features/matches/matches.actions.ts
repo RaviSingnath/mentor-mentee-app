@@ -38,6 +38,20 @@ async function currentUser() {
   return user ? { supabase, userId: user.id } : null;
 }
 
+/**
+ * Members may only act on their own matches (subjectId must be their own id). Admins may act for anyone.
+ * Returns an error result to send back, or null when allowed. The self case needs no database call.
+ */
+async function authorize(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  subjectId: string,
+): Promise<MatchActionResult | null> {
+  if (subjectId === userId) return null;
+  const { data } = await supabase.rpc("is_admin");
+  return data === true ? null : fail("Forbidden");
+}
+
 type Action = "saved" | "unsaved" | "dismissed";
 
 async function log(
@@ -64,6 +78,9 @@ export async function saveMatch(input: unknown): Promise<MatchActionResult> {
   if (!ctx) return fail("Not signed in");
   const { supabase, userId } = ctx;
   const { subjectId, candidateId, score } = parsed.data;
+
+  const denied = await authorize(supabase, userId, subjectId);
+  if (denied) return denied;
 
   const saved = await supabase.from("saved_matches").insert({
     actor_id: userId,
@@ -93,6 +110,9 @@ export async function unsaveMatch(input: unknown): Promise<MatchActionResult> {
   const { supabase, userId } = ctx;
   const { subjectId, candidateId, score } = parsed.data;
 
+  const denied = await authorize(supabase, userId, subjectId);
+  if (denied) return denied;
+
   const removed = await supabase
     .from("saved_matches")
     .delete()
@@ -121,6 +141,9 @@ export async function dismissMatch(input: unknown): Promise<MatchActionResult> {
   const { supabase, userId } = ctx;
   const { subjectId, candidateId, score } = parsed.data;
 
+  const denied = await authorize(supabase, userId, subjectId);
+  if (denied) return denied;
+
   const removed = await supabase
     .from("saved_matches")
     .delete()
@@ -148,6 +171,10 @@ export async function logViews(input: unknown): Promise<MatchActionResult> {
   if (!ctx) return fail("Not signed in");
   const { supabase, userId } = ctx;
   const { subjectId, items } = parsed.data;
+
+  const denied = await authorize(supabase, userId, subjectId);
+  if (denied) return denied;
+
   if (items.length === 0) return { ok: true };
 
   const since = new Date(Date.now() - VIEW_DEDUPE_MS).toISOString();
