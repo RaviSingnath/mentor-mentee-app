@@ -42,7 +42,7 @@ export default function EditAddressForm({ onSuccess }: InviteAdminFormProps) {
     await handleFormSubmit({
       action: () => inviteAdminAction(formData as TInviteAdmin),
       setError,
-      successMessage: "Student invited successfully",
+      successMessage: "Admin invited successfully",
       onSuccess: () => {
         reset();
         onSuccess?.();

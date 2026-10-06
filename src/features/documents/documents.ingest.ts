@@ -3,7 +3,7 @@ import { embedDocumentChunks } from "@/lib/ai/embeddings";
 import { chunkPages, MAX_CHUNKS_PER_DOCUMENT } from "./documents.chunking";
 import { extractPages } from "./documents.extract";
 import type { TDocumentMime } from "./documents.schema";
-import { createAdminClient } from "../../../supabase/admin";
+import { supabaseAdmin } from "../../../supabase/admin";
 import { ActionResponse } from "@/lib/types/action-response";
 import {
   deleteDocumentChunksMutation,
@@ -80,7 +80,7 @@ export async function ingestStep(
     total: number;
   }>
 > {
-  const admin = createAdminClient();
+  const admin = supabaseAdmin;
 
   const { data, error } = await getDocumentsFileFieldsQuery(documentId);
 

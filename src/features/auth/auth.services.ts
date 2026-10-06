@@ -1,7 +1,7 @@
 import { TSignUp, TLogin, TInviteAdmin } from "@/features/auth/auth.schema";
 import createClient from "../../../supabase/server";
 import { RequestContext } from "@/lib/auth/request-context";
-import { createAdminClient } from "../../../supabase/admin";
+import { supabaseAdmin } from "../../../supabase/admin";
 import { assertCanInvite } from "./security/invite.create.security";
 import { getInviteByEmail } from "../invite/invite.queries";
 import { Errors } from "@/lib/errors/error-factory";
@@ -84,8 +84,6 @@ export async function inviteAdminService({
   ctx,
   data,
 }: InviteUserServiceInput) {
-  const supabaseAdmin = createAdminClient();
-
   // 1. Permission + scope check
   await assertCanInvite(ctx, data);
 

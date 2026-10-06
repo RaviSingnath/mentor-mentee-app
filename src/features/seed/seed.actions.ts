@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { isCurrentUserAdmin } from "@/lib/auth/is-admin";
-import { createAdminClient } from "../../../supabase/admin";
+import { supabaseAdmin } from "../../../supabase/admin";
 import {
   createSeedBatch,
   purgeSeedData,
@@ -20,7 +20,7 @@ export type BatchActionResult =
 export async function purgeDemoData(): Promise<PurgeResult> {
   if (!(await isCurrentUserAdmin())) return { ok: false, error: "Forbidden" };
   try {
-    return { ok: true, purged: await purgeSeedData(createAdminClient()) };
+    return { ok: true, purged: await purgeSeedData(supabaseAdmin) };
   } catch (e) {
     return {
       ok: false,
@@ -47,10 +47,7 @@ export async function loadDemoBatch(
   if (!parsed.success) return { ok: false, error: "Invalid batch index" };
 
   try {
-    const result = await createSeedBatch(
-      createAdminClient(),
-      parsed.data.batchIndex,
-    );
+    const result = await createSeedBatch(supabaseAdmin, parsed.data.batchIndex);
     return { ok: true, ...result };
   } catch (e) {
     return {

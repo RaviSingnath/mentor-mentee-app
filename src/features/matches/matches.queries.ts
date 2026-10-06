@@ -1,6 +1,6 @@
 "use server";
 
-import { createAdminClient } from "../../../supabase/admin";
+import { supabaseAdmin } from "../../../supabase/admin";
 import createClient from "../../../supabase/server";
 
 export async function isActiveMemberQuery() {
@@ -36,14 +36,10 @@ export async function getSavedMatchesQuery(
 }
 
 export async function getMatchPoolQuery() {
-  const supabase = createAdminClient();
-
-  return supabase.rpc("match_pool");
+  return supabaseAdmin.rpc("match_pool");
 }
 
-export async function getCandidatesProfileQuery(
-  candidatesId: string[],
-) {
+export async function getCandidatesProfileQuery(candidatesId: string[]) {
   const supabase = await createClient();
 
   return supabase

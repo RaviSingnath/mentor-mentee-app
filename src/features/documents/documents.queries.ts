@@ -1,6 +1,6 @@
 import type { TDocumentMime, TDocumentStatus } from "./documents.schema";
 import createClient from "../../../supabase/server";
-import { createAdminClient } from "../../../supabase/admin";
+import { supabaseAdmin } from "../../../supabase/admin";
 import { DOCUMENTS_BUCKET } from "./documents.ingest";
 
 export interface DocumentRow {
@@ -41,7 +41,7 @@ export async function listDocuments(isAdmin: boolean): Promise<DocumentRow[]> {
 
   if (isAdmin && rows.length > 0) {
     const ids = [...new Set(rows.map((r) => r.uploaded_by))];
-    const supabaseAdmin = createAdminClient();
+
     const { data: people } = await supabaseAdmin
       .from("profiles")
       .select("id, full_name")
@@ -71,9 +71,7 @@ export async function getDuplicateDocumentsQuery(
   callerId: string,
   contentHash: string,
 ) {
-  const admin = createAdminClient();
-
-  return admin
+  return supabaseAdmin
     .from("documents")
     .select("title")
     .eq("uploaded_by", callerId)
@@ -82,17 +80,13 @@ export async function getDuplicateDocumentsQuery(
 }
 
 export const getDocumentSignedUrlQuery = async (path: string) => {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin.storage
     .from(DOCUMENTS_BUCKET)
     .createSignedUploadUrl(path);
 };
 
 export async function getDocumentsByIdQuery(documentId: string) {
-  const admin = createAdminClient();
-
-  return admin
+  return supabaseAdmin
     .from("documents")
     .select("id, uploaded_by, title, original_filename, storage_path, status")
     .eq("id", documentId)
@@ -100,9 +94,7 @@ export async function getDocumentsByIdQuery(documentId: string) {
 }
 
 export async function getDocumentsFileFieldsQuery(documentId: string) {
-  const admin = createAdminClient();
-
-  return admin
+  return supabaseAdmin
     .from("documents")
     .select("id, title, storage_path, mime_type, content_hash, status")
     .eq("id", documentId)
@@ -110,9 +102,7 @@ export async function getDocumentsFileFieldsQuery(documentId: string) {
 }
 
 export async function getChunkByDocumentIdQuery(documentId: string) {
-  const admin = createAdminClient();
-
-  return admin
+  return supabaseAdmin
     .from("document_chunks")
     .select("id", { count: "exact", head: true })
     .eq("document_id", documentId);

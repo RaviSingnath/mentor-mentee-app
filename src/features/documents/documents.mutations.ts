@@ -1,4 +1,4 @@
-import { createAdminClient } from "../../../supabase/admin";
+import { supabaseAdmin } from "../../../supabase/admin";
 import { titleFromFilename, TUploadRequest } from "./documents.schema";
 import { Database } from "../../../supabase/database.types";
 import { DOCUMENTS_BUCKET } from "./documents.ingest";
@@ -11,8 +11,6 @@ export async function createDocumentsMutation(
   path: string,
   v: TUploadRequest,
 ) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin.from("documents").insert({
     id: documentId,
     uploaded_by: callerId,
@@ -26,14 +24,10 @@ export async function createDocumentsMutation(
 }
 
 export async function deleteDocumentsMutation(documentId: string) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin.from("documents").delete().eq("id", documentId);
 }
 
 export async function deleteDocumentChunksMutation(documentId: string) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin
     .from("document_chunks")
     .delete()
@@ -44,8 +38,6 @@ export async function updateFailedDocumentMutation(
   documentId: string,
   message: string,
 ) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin
     .from("documents")
     .update({
@@ -57,8 +49,6 @@ export async function updateFailedDocumentMutation(
 }
 
 export async function updateDocumentProcessingMutation(documentId: string) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin
     .from("documents")
     .update({ status: "processing", error_message: null })
@@ -69,8 +59,6 @@ export async function updateDocumentReadyMutation(
   documentId: string,
   chunkCount: number,
 ) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin
     .from("documents")
     .update({
@@ -82,8 +70,6 @@ export async function updateDocumentReadyMutation(
 }
 
 export async function upsertDocumentChunkMutation(rows: ChunkInsert[]) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin
     .from("document_chunks")
     .upsert(rows, { onConflict: "document_id,chunk_index" });
@@ -93,8 +79,6 @@ export async function updateDocumentTitleMutation(
   documentId: string,
   title: string,
 ) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin
     .from("documents")
     .update({ title: title })
@@ -102,14 +86,10 @@ export async function updateDocumentTitleMutation(
 }
 
 export async function deletestoredDocumentMutation(storagePath: string) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin.storage.from(DOCUMENTS_BUCKET).remove([storagePath]);
 }
 
 export async function deleteDocumentMutation(documentId: string) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin.from("documents").delete().eq("id", documentId);
 }
 
@@ -117,8 +97,6 @@ export async function getDocumentDownloadUrlMutation(
   storagePath: string,
   originalFilename: string,
 ) {
-  const supabaseAdmin = createAdminClient();
-
   return supabaseAdmin.storage
     .from(DOCUMENTS_BUCKET)
     .createSignedUrl(storagePath, 60, {

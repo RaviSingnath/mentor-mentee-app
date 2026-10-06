@@ -88,7 +88,7 @@ export async function createUploadService(
   );
 
   if (duplicate.data) {
-    throw Errors.alreadyExists("Department already exists");
+    throw Errors.alreadyExists("File");
   }
 
   const documentId = crypto.randomUUID();

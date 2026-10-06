@@ -12,7 +12,7 @@ export const maxDuration = 60;
 export default async function DocumentsPage() {
   const user = await getCurrentUserServer();
 
-  if (!user) redirect("/login"); // adjust to your sign-in route
+  if (!user) redirect("/");
 
   const isAdmin = await isCurrentUserAdmin();
   const docs = await listDocuments(isAdmin);

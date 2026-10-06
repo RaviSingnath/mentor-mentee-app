@@ -1,12 +1,11 @@
 "use server";
 
 import UserRole from "@/lib/rbac/roles";
-import { createAdminClient } from "../../../supabase/admin";
+import { supabaseAdmin } from "../../../supabase/admin";
 import createClient from "../../../supabase/server";
 
 export async function acceptInviteService(token: string) {
   const supabase = await createClient();
-  const supabaseAdmin = createAdminClient();
 
   const {
     data: { user },

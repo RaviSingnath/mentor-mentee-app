@@ -46,6 +46,38 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_chunks: {
         Row: {
           chunk_index: number
@@ -290,6 +322,41 @@ export type Database = {
             columns: ["subject_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["message_role"]
+          sources: Json
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["message_role"]
+          sources?: Json
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["message_role"]
+          sources?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -563,6 +630,7 @@ export type Database = {
         | "revoked"
         | "cancelled"
       match_action: "viewed" | "saved" | "unsaved" | "dismissed"
+      message_role: "user" | "assistant"
       profile_status: "active" | "inactive"
       topic_relation: "skill" | "goal" | "interest"
       user_role: "super_admin" | "admin" | "mentor" | "mentee"
@@ -703,6 +771,7 @@ export const Constants = {
         "cancelled",
       ],
       match_action: ["viewed", "saved", "unsaved", "dismissed"],
+      message_role: ["user", "assistant"],
       profile_status: ["active", "inactive"],
       topic_relation: ["skill", "goal", "interest"],
       user_role: ["super_admin", "admin", "mentor", "mentee"],
