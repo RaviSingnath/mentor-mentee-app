@@ -523,6 +523,23 @@ export type Database = {
         }
         Returns: undefined
       }
+      save_my_profile: {
+        Args: {
+          p_availability?: Json
+          p_bio: string
+          p_city: string
+          p_country: string
+          p_experience_level?: Database["public"]["Enums"]["experience_level"]
+          p_full_name: string
+          p_goals?: string[]
+          p_interests?: string[]
+          p_languages: string[]
+          p_skills?: string[]
+          p_state: string
+          p_timezone: string
+        }
+        Returns: undefined
+      }
       set_profile_topics: {
         Args: {
           p_goals?: string[]
