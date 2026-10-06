@@ -11,6 +11,8 @@ import { ActionResponse } from "@/lib/types/action-response";
 type Router = ReturnType<typeof useRouter>;
 
 type HandleFormSubmitOptions<TForm extends FieldValues, TData = unknown> = {
+  beforeActionCall?: () => void;
+
   action: () => Promise<ActionResponse<TData>>;
 
   setError: UseFormSetError<TForm>;
@@ -26,6 +28,7 @@ export default async function handleFormSubmit<
   TForm extends FieldValues,
   TData = unknown,
 >({
+  beforeActionCall,
   action,
   setError,
   router,
@@ -33,6 +36,8 @@ export default async function handleFormSubmit<
   onSuccess,
 }: HandleFormSubmitOptions<TForm, TData>): Promise<boolean> {
   try {
+    if (beforeActionCall) beforeActionCall();
+
     const result = await action();
 
     if (!result.success) {

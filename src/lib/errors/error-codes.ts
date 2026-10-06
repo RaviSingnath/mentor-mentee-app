@@ -29,6 +29,12 @@ export const ERROR_CODES = {
 
   // Generic
   INTERNAL_ERROR: "INTERNAL_ERROR",
+
+  //Storage
+  FILE_TOO_LARGE: "FILE_TOO_LARGE",
+  UNSUPPORTED_FILE_TYPE: "UNSUPPORTED_FILE_TYPE",
+  STORAGE_ERROR: "STORAGE_ERROR",
+  PARTIAL_CHUNK_FAIL: "PARTIAL_CHUNK_FAIL",
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

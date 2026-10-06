@@ -500,8 +500,11 @@ export type Database = {
           content: string
           document_id: string
           document_title: string
+          original_filename: string
           page_number: number
           similarity: number
+          uploaded_by: string
+          uploader_name: string
         }[]
       }
       match_pool: { Args: never; Returns: Json }

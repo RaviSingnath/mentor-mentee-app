@@ -2,7 +2,7 @@ import AppError from "./app-error";
 import { ActionResponse } from "@/lib/types/action-response";
 import { ERROR_CODES } from "./error-codes";
 
-export function handleError(error: unknown): ActionResponse {
+export function handleError<T = unknown>(error: unknown): ActionResponse<T> {
   if (error instanceof AppError) {
     return {
       success: false,
