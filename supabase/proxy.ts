@@ -9,6 +9,9 @@ const protectedRoutes = [
   "/profile",
   "/saved-matches",
   "/matches",
+  "/chat",
+  "/documents",
+  "/seed",
 ];
 
 // route -> roles allowed to access it
@@ -16,7 +19,10 @@ const roleRoutes: Record<string, string[]> = {
   "/dashboard": ["super_admin", "admin", "mentor", "mentee"],
   "/profile": ["mentor", "mentee"],
   "/saved-matches": ["mentor", "mentee"],
-  "/matches": ["mentor", "mentee"],
+  "/matches": ["super_admin", "admin", "mentor", "mentee"],
+  "/chat": ["mentor", "mentee"],
+  "/documents": ["super_admin", "admin", "mentor", "mentee"],
+  "/seed": ["super_admin", "admin"],
 };
 
 interface AppClaims {
