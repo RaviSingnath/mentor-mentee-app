@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 
 import { getCurrentUserServer } from "@/lib/auth/getCurrentUserServer";
 import DashboardWrapper from "@/components/layout/dashboard-wrapper";
+import DashboardContent from "./_components/dashboard-content";
+import UserRole from "@/lib/rbac/roles";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -16,5 +18,9 @@ export default async function DashboardPage() {
     redirect("/");
   }
 
-  return <DashboardWrapper user={user}></DashboardWrapper>;
+  return (
+    <DashboardWrapper user={user}>
+      <DashboardContent user={user} />
+    </DashboardWrapper>
+  );
 }

@@ -3,6 +3,8 @@
 import UserRole from "@/lib/rbac/roles";
 import { supabaseAdmin } from "../../../supabase/admin";
 import createClient from "../../../supabase/server";
+import { getInvitesQuery } from "./invite.queries";
+import { mapSupabaseError } from "@/lib/errors/supabase-error";
 
 export async function acceptInviteService(token: string) {
   const supabase = await createClient();
@@ -65,3 +67,16 @@ export async function acceptInviteService(token: string) {
 
   return invite;
 }
+
+export async function getInvitesService() {
+  const { data, error } = await getInvitesQuery();
+
+  if (error) {
+    throw mapSupabaseError(error);
+  }
+
+  return data;
+}
+export type InvitesListResponse = Awaited<ReturnType<typeof getInvitesService>>;
+
+export type InvitesListItem = InvitesListResponse[number];
