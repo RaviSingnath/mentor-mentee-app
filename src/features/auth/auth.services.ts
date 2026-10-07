@@ -55,7 +55,7 @@ export async function signUpService({ data }: signupServiceInput) {
 
   if (!signupData.user) throw Errors.internal();
 
-  return signupData.user;
+  return redirectUrl;
 }
 
 type loginServiceInput = {

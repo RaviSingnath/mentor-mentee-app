@@ -73,6 +73,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   async function onSubmit(formData: TSignUp) {
     try {
       const response = await signUpAction(formData);
+      console.log("response: ", response);
 
       if (!response.success) {
         if (response.errors) {
