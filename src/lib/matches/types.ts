@@ -81,6 +81,8 @@ export interface SubjectOption {
 
 export interface MatchView {
   subject: PublicProfile | null;
+  /** Set when the subject's profile is too empty to match on; results is then empty. */
+  profileTooEmpty: boolean;
   subjectOptions: SubjectOption[];
   results: MatchCardData[];
   dismissedCount: number;

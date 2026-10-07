@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
@@ -59,7 +60,7 @@ export default async function MatchesPage({
           <h1 className="text-2xl font-semibold">
             {isAdmin ? "Matches" : "Your matches"}
           </h1>
-          {view.subject && <MatchAgainButton />}
+          {view.subject && !view.profileTooEmpty && <MatchAgainButton />}
         </div>
         {isAdmin && (
           <SubjectPicker
@@ -77,7 +78,35 @@ export default async function MatchesPage({
         </p>
       )}
 
-      {view.subject && (
+      {view.subject && view.profileTooEmpty && (
+        <section
+          className="space-y-3 rounded-lg border bg-card p-4 text-sm"
+          role="status"
+        >
+          {isAdmin && view.subject.id !== user.id ? (
+            <p>
+              <span className="font-medium">{view.subject.fullName}</span> has
+              not filled in their profile yet, so there is nothing to match on.
+            </p>
+          ) : (
+            <>
+              <p className="font-medium">Your profile is empty</p>
+              <p className="text-muted-foreground">
+                Fill in your profile (skills or goals, availability, languages
+                and so on) to get your best matches.
+              </p>
+              <Link
+                href="/profile"
+                className="inline-block font-medium underline underline-offset-4"
+              >
+                Complete my profile
+              </Link>
+            </>
+          )}
+        </section>
+      )}
+
+      {view.subject && !view.profileTooEmpty && (
         <>
           <p className="text-sm text-muted-foreground">
             {isAdmin ? (

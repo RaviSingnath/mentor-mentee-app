@@ -9,11 +9,34 @@ import type {
 } from "./types";
 import { rankMatches } from "../matching/matching";
 import { DEFAULT_LIMIT } from "../matching/constants";
-import { UserRoleLabel } from "../rbac/roles";
 import {
   getMatchInteractionsQuery,
   getSavedMatchesQuery,
 } from "@/features/matches/matches.queries";
+
+/** How much of a profile is filled in. Mirrors profileCompleteness() in features/profile, but on pool data. */
+export interface ProfileStrength {
+  done: number;
+  total: number;
+}
+
+/** A profile needs at least this many of the checks done before we show matches for it. */
+export const MIN_PROFILE_STRENGTH = 1;
+
+export function poolProfileStrength(p: PoolProfile): ProfileStrength {
+  const topics = p.role === "mentor" ? p.skills : p.goals;
+  const checks = [
+    (p.bio ?? "").trim().length >= 20,
+    p.experienceLevel !== null,
+    (p.city ?? "").trim() !== "" && (p.country ?? "").trim() !== "",
+    p.timezone !== "UTC",
+    p.languages.length > 0,
+    topics.length > 0,
+    p.interests.length > 0,
+    p.availability.length > 0,
+  ];
+  return { done: checks.filter(Boolean).length, total: checks.length };
+}
 
 // ---------------------------------------------------------------------------
 // View model (what the page renders). Names only for topics, and never an email.
@@ -90,7 +113,24 @@ export function buildMatchView({
     ? pool.find((p) => p.id === effectiveId)
     : undefined;
   if (!subject)
-    return { subject: null, subjectOptions, results: [], dismissedCount: 0 };
+    return {
+      subject: null,
+      profileTooEmpty: false,
+      subjectOptions,
+      results: [],
+      dismissedCount: 0,
+    };
+
+  // An empty profile would only produce arbitrary-looking matches, so show none and ask them to fill it in.
+  if (poolProfileStrength(subject).done < MIN_PROFILE_STRENGTH) {
+    return {
+      subject: toPublicProfile(subject),
+      profileTooEmpty: true,
+      subjectOptions,
+      results: [],
+      dismissedCount: 0,
+    };
+  }
 
   // Dismissed people are removed BEFORE ranking, so the list refills with the next best match.
   const candidates = pool.filter((p) => !dismissed.has(p.id));
@@ -98,6 +138,7 @@ export function buildMatchView({
 
   return {
     subject: toPublicProfile(subject),
+    profileTooEmpty: false,
     subjectOptions,
     dismissedCount: pool.filter(
       (p) =>
