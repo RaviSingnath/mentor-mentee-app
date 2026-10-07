@@ -37,6 +37,7 @@ import { Input } from "@/components/ui/input";
 import { TSignUp, zSignUp } from "@/features/auth/auth.schema";
 import UserRole, { UserRoleLabel } from "@/lib/rbac/roles";
 import { signUpAction } from "@/features/auth/auth.actions";
+import { appToast } from "@/lib/helper/toast";
 
 type RoleOption = {
   role: UserRole;
@@ -94,8 +95,12 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       }
 
       reset();
+      appToast.success(
+        "Signup successfully done. Please check you mail to confirm your email.",
+      );
     } catch (error) {
       console.error(error);
+      appToast.error("Something went wrong. Please try again.");
 
       setError("root", {
         type: "server",

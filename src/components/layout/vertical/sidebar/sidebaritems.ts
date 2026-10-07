@@ -1,4 +1,10 @@
-export interface ChildItem {
+interface BaseMenuItem {
+  name?: string;
+  url?: string;
+  icon?: LucideIcon;
+}
+
+export interface ChildItem extends BaseMenuItem {
   id?: number | string;
   name: string;
   icon?: LucideIcon;
@@ -16,15 +22,12 @@ export interface ChildItem {
   isPro?: boolean;
 }
 
-export interface MenuItem {
+export interface MenuItem extends BaseMenuItem {
   heading?: string;
-  name?: string;
-  icon?: LucideIcon;
   id?: number;
   to?: string;
-  item?: MenuItem[];
   items?: ChildItem[];
-  url?: string;
+  item?: MenuItem[];
   disabled?: boolean;
   subtitle?: string;
   badgeType?: string;

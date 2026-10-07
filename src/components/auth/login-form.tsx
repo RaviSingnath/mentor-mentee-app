@@ -69,7 +69,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
 
       reset();
       router.push("/profile");
-      router.refresh();
+      // router.refresh();
     } catch (error) {
       console.error(error);
 

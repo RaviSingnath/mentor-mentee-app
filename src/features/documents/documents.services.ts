@@ -145,16 +145,19 @@ export async function renameDocumentService(
 
   if (!found) throw Errors.notFound("Document not found");
 
-  const { error } = await updateDocumentTitleMutation(found.doc.id, title);
+  const { data, error } = await updateDocumentTitleMutation(
+    found.doc.id,
+    title,
+  );
 
-  if (error)
+  if (error || !data)
     return {
       success: false,
       code: ERROR_CODES.DATABASE_ERROR,
       message: "Could not rename the document",
     };
 
-  return { success: true };
+  return { success: true, data: data };
 }
 
 export async function deleteDocumentService(
@@ -171,17 +174,17 @@ export async function deleteDocumentService(
 
   if (removed.error) throw throwOnStorageError(removed);
 
-  const { error } = await deleteDocumentMutation(found.doc.id);
+  const { data, error } = await deleteDocumentMutation(found.doc.id);
   if (error) throw mapSupabaseError(error);
 
-  if (error)
+  if (error || !data)
     return {
       success: false,
       code: ERROR_CODES.DATABASE_ERROR,
       message: "Could not delete the document",
     };
 
-  return { success: true };
+  return { success: true, data: data };
 }
 
 export type DocumentDownloadUrlResult = {

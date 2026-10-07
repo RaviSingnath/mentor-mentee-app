@@ -13,9 +13,9 @@ import { EXPERIENCE_OPTIONS, TIMEZONES, timezoneLabel } from "@/features/profile
 import { profileCompleteness, zProfile, type TProfile, type TProfileInput } from "@/features/profile/profile.schema";
 import handleFormSubmit from "@/lib/helper/handle-RHF-submit";
 import { appToast } from "@/lib/helper/toast";
-import { AvailabilityEditor } from "@/components/profile-2/availability-editor";
-import { LanguagePicker } from "@/components/profile-2/language-picker";
-import { TagInput } from "@/components/profile-2/tag-input";
+import { AvailabilityEditor } from "@/components/profile/availability-editor";
+import { LanguagePicker } from "@/components/profile/language-picker";
+import { TagInput } from "@/components/profile/tag-input";
 
 interface Props {
   role: "mentor" | "mentee";

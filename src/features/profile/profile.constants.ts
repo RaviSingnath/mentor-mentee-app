@@ -1,4 +1,4 @@
-import type { ExperienceLevel } from "@/lib/matching/matching";
+import type { ExperienceLevel } from "@/lib/matching/types";
 
 export const WEEKDAYS = [
   { value: 0, label: "Sunday", short: "Sun" },

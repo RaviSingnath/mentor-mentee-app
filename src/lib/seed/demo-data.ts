@@ -8,8 +8,8 @@
  * Availability is written in each person's LOCAL time ("Mon 18-20" = Monday 18:00 to 20:00).
  * Everything here is invented; none of these are real people.
  */
-import type { AvailabilitySlot } from "@/lib/matching/availability";
-import type { ExperienceLevel } from "@/lib/matching/matching";
+import type { AvailabilitySlot } from "../matching/types";
+import type { ExperienceLevel } from "../matching/types";
 
 export type SeedDomain = "tech" | "business";
 

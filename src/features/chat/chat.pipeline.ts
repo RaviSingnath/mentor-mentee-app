@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Json } from "../../../supabase/database.types";
 import {
   GeminiBlockedError,
   GeminiRateLimitError,
@@ -136,14 +137,12 @@ export async function* runChat(
   }
 
   // 3. save the question
-  const saved = await admin
-    .from("messages")
-    .insert({
-      conversation_id: conversationId,
-      role: "user",
-      content: question,
-      sources: [],
-    });
+  const saved = await admin.from("messages").insert({
+    conversation_id: conversationId,
+    role: "user",
+    content: question,
+    sources: [],
+  });
   if (saved.error)
     return yield { type: "error", code: "failed", message: GENERIC_FAILURE };
 
@@ -214,7 +213,7 @@ async function* finish(
       conversation_id: conversationId,
       role: "assistant",
       content: answer,
-      sources,
+      sources: sources as unknown as Json,
     })
     .select("id")
     .single();

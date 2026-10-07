@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/app/providers";
 import "./globals.css";
 import LeftLayout from "@/components/home/left-section/left-layout";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -52,6 +53,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="min-h-screen">{children}</div>
+          <Toaster richColors position="top-right" />
         </ThemeProvider>
       </body>
     </html>

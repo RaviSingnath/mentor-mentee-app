@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { AvailabilitySlot } from "@/lib/matching/availability";
+import type { AvailabilitySlot } from "@/lib/matching/types";
 import { WEEKDAYS } from "@/features/profile/profile.constants";
 import { findOverlap, MAX_SLOTS } from "@/features/profile/profile.schema";
 import { chipClass } from "./styles";

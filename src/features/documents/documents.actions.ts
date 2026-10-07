@@ -105,7 +105,7 @@ export async function renameDocumentAction(
 /** Deletes the stored file, then the row (its chunks go with it). The uploader or any admin can do this. */
 export async function deleteDocumentAction(
   input: unknown,
-): Promise<ActionResponse<{ signedUrl: string }>> {
+): Promise<ActionResponse> {
   try {
     const validatedFields = zDocumentId.safeParse(input);
 
@@ -120,11 +120,13 @@ export async function deleteDocumentAction(
 
     const doc = validatedFields.data;
 
-    await deleteDocumentService(doc.document_id);
+    const result = await deleteDocumentService(doc.document_id);
 
     revalidatePath("/documents");
 
-    return { success: true };
+    if (!result.success) revalidatePath("/documents");
+
+    return { success: true, data: result };
   } catch (error) {
     return handleError(error);
   }

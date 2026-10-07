@@ -14,6 +14,7 @@ import { generateToken } from "@/lib/helper/generate-token";
 import { mapSupabaseAuthError } from "@/lib/errors/supabase-auth-error";
 import { InvitationInsert } from "../invite/invite.types";
 import { getExpiresAtDate } from "@/lib/helper/date";
+import { ERROR_CODES } from "@/lib/errors/error-codes";
 
 type signupServiceInput = {
   data: TSignUp;
@@ -37,10 +38,19 @@ export async function signUpService({ data }: signupServiceInput) {
   });
 
   if (error) {
-    throw new Error("Error occured while singing in.");
+    if (error.code === "user_already_exists" || error.code === "email_exists") {
+      throw Errors.alreadyExists("An account with this email");
+    }
+    throw Errors.internal();
   }
 
-  return signupData;
+  if (signupData.user?.identities?.length === 0) {
+    throw Errors.alreadyExists("An account with this email");
+  }
+
+  if (!signupData.user) throw Errors.internal();
+
+  return signupData.user;
 }
 
 type loginServiceInput = {

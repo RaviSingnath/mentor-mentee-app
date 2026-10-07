@@ -35,13 +35,18 @@ export async function signUpAction(formData: TSignUp): Promise<ActionResponse> {
   }
 
   try {
-    const profile = await signUpService({
-      data: validatedFields.data,
-    });
+    const user = await signUpService({ data: validatedFields.data });
+
+    if (!user)
+      return {
+        success: false,
+        code: ERROR_CODES.DATABASE_ERROR,
+        message: "asda",
+      };
 
     return {
       success: true,
-      data: profile,
+      data: { id: user.id, email: user.email },
     };
   } catch (error) {
     return handleError(error);

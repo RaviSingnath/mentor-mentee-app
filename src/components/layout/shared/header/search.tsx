@@ -1,20 +1,38 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Component, Search as SearchIcon } from 'lucide-react';
+import { Component, type LucideIcon, Search as SearchIcon } from "lucide-react";
 
 import SimpleBar from "simplebar-react";
-import SidebarContent from "../../vertical/sidebar/sidebaritems";
+import SidebarContent, {
+  type ChildItem,
+  type MenuItem,
+} from "../../vertical/sidebar/sidebaritems";
 
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/lib/context/AuthProvider";
+import UserRole from "@/lib/rbac/roles";
+
+interface SearchResult {
+  name: string;
+  url: string;
+  path: string;
+  icon?: LucideIcon;
+}
 
 function Search() {
+  const { user } = useAuth();
+  const userRole = user?.role as UserRole | undefined;
   const [query, setQuery] = useState("");
 
   // 🔍 Recursive search through menu
-  const searchItems = (items: any[], q: string, parentPath = "") => {
-    let results: any[] = [];
+  const searchItems = (
+    items: (MenuItem | ChildItem)[],
+    q: string,
+    parentPath = "",
+  ): SearchResult[] => {
+    let results: SearchResult[] = [];
 
     items.forEach((item) => {
       const currentPath = parentPath
@@ -25,7 +43,8 @@ function Search() {
       if (
         item.name &&
         item.url &&
-        item.name.toLowerCase().includes(q.toLowerCase())
+        item.name.toLowerCase().includes(q.toLowerCase()) &&
+        currentPath
       ) {
         results.push({
           name: item.name,
@@ -46,14 +65,15 @@ function Search() {
 
   // Memoize filtered results
   const results = useMemo(() => {
-    if (!query.trim()) return [];
-    return searchItems(SidebarContent, query);
-  }, [query]);
+    if (!query.trim() || !userRole) return [];
+    return searchItems(SidebarContent[userRole], query);
+  }, [query, userRole]);
 
   return (
     <div className="relative w-full">
       <div className="flex items-center relative w-xs mx-auto ">
-        <SearchIcon size={16}
+        <SearchIcon
+          size={16}
           className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
         />
         <Input
@@ -65,8 +85,9 @@ function Search() {
         />
       </div>
       <div
-        className={`absolute w-full bg-card rounded-md top-11 z-10 start-0 shadow-md border border-border ${Boolean(query) ? "block" : "hidden"
-          }`}
+        className={`absolute w-full bg-card rounded-md top-11 z-10 start-0 shadow-md border border-border ${
+          Boolean(query) ? "block" : "hidden"
+        }`}
       >
         <SimpleBar className="h-72 p-4 custom-scroll">
           {Boolean(results.length) ? (
@@ -92,9 +113,7 @@ function Search() {
             ))
           ) : (
             <div className="flex items-center justify-center h-full">
-              <h1 className="text-medium font-medium ">
-                No Components Found!
-              </h1>
+              <h1 className="text-medium font-medium ">No Components Found!</h1>
             </div>
           )}
         </SimpleBar>
