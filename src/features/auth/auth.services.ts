@@ -41,6 +41,11 @@ export async function signUpService({ data }: signupServiceInput) {
     if (error.code === "user_already_exists" || error.code === "email_exists") {
       throw Errors.alreadyExists("An account with this email");
     }
+
+    if (error.code === "over_email_send_rate_limit" || error.status === 429) {
+      throw Errors.emailLimit(error);
+    }
+
     throw Errors.internal();
   }
 
@@ -127,7 +132,23 @@ export async function inviteAdminService({
       },
     });
 
-  if (authInviteError) throw mapSupabaseAuthError(authInviteError);
+  if (authInviteError) {
+    if (
+      authInviteError.code === "user_already_exists" ||
+      authInviteError.code === "email_exists"
+    ) {
+      throw Errors.alreadyExists("An account with this email");
+    }
+
+    if (
+      authInviteError.code === "over_email_send_rate_limit" ||
+      authInviteError.status === 429
+    ) {
+      throw Errors.emailLimit(authInviteError);
+    }
+
+    throw mapSupabaseAuthError(authInviteError);
+  }
 
   const { error: roleError } = await supabaseAdmin
     .from("profiles")

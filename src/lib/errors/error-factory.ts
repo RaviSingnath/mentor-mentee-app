@@ -44,6 +44,19 @@ export const Errors = {
     );
   },
 
+  emailLimit(error: AuthError) {
+    return new AppError(
+      "We've sent too many emails right now. Please wait a few minutes and try again.",
+      429,
+      ERROR_CODES.ALREADY_EXISTS,
+      {
+        provider: "supabase",
+        originalCode: error.code,
+        originalMessage: error.message,
+      },
+    );
+  },
+
   database() {
     return new AppError(
       "Database operation failed",
