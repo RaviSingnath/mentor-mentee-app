@@ -43,10 +43,7 @@ export async function signUpService({ data }: signupServiceInput) {
     }
 
     if (error.code === "over_email_send_rate_limit" || error.status === 429) {
-      // throw Errors.emailLimit(error);
-      throw Errors.debugVar(
-        `SITE_URL:  ${process.env.SITE_URL}, NEXT_PUBLIC_SITE_URL: ${process.env.NEXT_PUBLIC_SITE_URL}}`,
-      );
+      throw Errors.emailLimit(error);
     }
 
     throw Errors.internal();
@@ -58,7 +55,7 @@ export async function signUpService({ data }: signupServiceInput) {
 
   if (!signupData.user) throw Errors.internal();
 
-  return redirectUrl;
+  return signupData.user;
 }
 
 type loginServiceInput = {

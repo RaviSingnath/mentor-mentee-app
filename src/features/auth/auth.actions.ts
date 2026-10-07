@@ -46,7 +46,7 @@ export async function signUpAction(formData: TSignUp): Promise<ActionResponse> {
 
     return {
       success: true,
-      data: { url: user },
+      data: { id: user.id, email: user.email },
     };
   } catch (error) {
     return handleError(error);

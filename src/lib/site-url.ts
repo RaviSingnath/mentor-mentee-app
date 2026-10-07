@@ -18,11 +18,7 @@ const trimSlash = (url: string) => url.replace(/\/+$/, "");
  */
 export async function getSiteUrl(): Promise<string> {
   const fromEnv = process.env.SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL;
-  console.log(
-    "process.env: ",
-    process.env.SITE_URL,
-    process.env.NEXT_PUBLIC_SITE_URL,
-  );
+
   if (fromEnv?.trim()) return trimSlash(fromEnv.trim());
 
   try {
