@@ -2,6 +2,7 @@ import { type Metadata } from "next";
 import { Inter } from "next/font/google";
 import localFont from "next/font/local";
 import { cn } from "@/lib/utils";
+import { getSiteUrl } from "@/lib/site-url";
 
 import { ThemeProvider } from "@/app/providers";
 
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     "Connect with mentors who match your goals, schedule sessions, and track your progress, all in one place.",
   alternates: {
     types: {
-      "application/rss+xml": `${process.env.NEXT_PUBLIC_SITE_URL}/feed.xml`,
+      "application/rss+xml": `${getSiteUrl()}/feed.xml`,
     },
   },
 };

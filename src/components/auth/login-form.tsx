@@ -72,7 +72,6 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
       reset();
       startTransition(() => {
         router.push("/dashboard");
-        router.refresh();
       });
     } catch (error) {
       console.error(error);

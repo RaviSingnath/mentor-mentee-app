@@ -14,7 +14,7 @@ import { generateToken } from "@/lib/helper/generate-token";
 import { mapSupabaseAuthError } from "@/lib/errors/supabase-auth-error";
 import { InvitationInsert } from "../invite/invite.types";
 import { getExpiresAtDate } from "@/lib/helper/date";
-import { ERROR_CODES } from "@/lib/errors/error-codes";
+import { getAuthCallbackUrl, getSiteUrl } from "@/lib/site-url";
 
 type signupServiceInput = {
   data: TSignUp;
@@ -23,7 +23,7 @@ type signupServiceInput = {
 export async function signUpService({ data }: signupServiceInput) {
   const supabase = await createClient();
 
-  const redirectUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`;
+  const redirectUrl = await getAuthCallbackUrl();
 
   const { data: signupData, error } = await supabase.auth.signUp({
     email: data.email,
@@ -115,7 +115,7 @@ export async function inviteAdminService({
 
   // 4. Generate invite token + URL
   const token = generateToken();
-  const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/accept-invite?token=${token}`;
+  const inviteUrl = `${getSiteUrl()}/accept-invite?token=${token}`;
 
   // 5. Send via Supabase auth (uncomment when email is ready)
   const { data: invitedUserData, error: authInviteError } =
