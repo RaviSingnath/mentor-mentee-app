@@ -36,9 +36,9 @@ export default async function Layout({
                   {children}
                 </RouteErrorBoundary>
               </div>
-              <div className="pt-6">
+              {/* <div className="pt-6">
                 <Footer />
-              </div>
+              </div> */}
             </div>
           </div>
         </SidebarInset>

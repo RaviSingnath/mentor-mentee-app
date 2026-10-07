@@ -110,10 +110,10 @@ export default function ProfileSheet() {
         </div>
 
         {/* Footer */}
-        <SheetFooter className="px-0 pb-6">
+        {/* <SheetFooter className="px-0 pb-6">
           <div className="border-t border-dashed border-border w-full">
             <div className="rounded-sm pt-6 flex flex-col justify-center items-center gap-3">
-              {/* <div>
+              <div>
                 <img
                   src="/images/backgrounds/sidebarbuynow.svg"
                   alt="login-bg"
@@ -127,12 +127,12 @@ export default function ProfileSheet() {
                 <p className="text-sm text-muted-foreground">
                   Customize your dashboard
                 </p>
-              </div> */}
+              </div>
 
               <LogoutButton />
             </div>
           </div>
-        </SheetFooter>
+        </SheetFooter> */}
       </SheetContent>
     </Sheet>
   );
