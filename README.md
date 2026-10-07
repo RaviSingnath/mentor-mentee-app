@@ -3,14 +3,17 @@
 Mentor/mentee matching with a document-grounded chatbot. All data is fictional.
 
 - **Live app:** `TODO: https://mentor-mentee-nu.vercel.app`
-- **Demo video:** `TODO: link`
+- **Demo video:** `Codebase: https://www.loom.com/share/5f1ce62739224c0ab71aa07dfa9e1aef`
+- **Demo video:** `Live Site: https://www.loom.com/share/df3d364772514107a4178d80579baa6a`
+- **Demo video:** `Live Site: https://www.loom.com/share/8423fe381569495d9677c25c659c5f0e`
+
 
 ## Reviewer access
 
 - Registration is open: sign up, confirm the email, then complete your profile at `/profile`.
 - Test account (Super Admin): `super.admin.mm@yopmail.com` / `123456`, role: `super_admin`.
-- Test account (Mentor): `demo-business-mentor-01@yopmail.com` / `123456`, role: `mentor`.
-- Test account (Mentee): `demo-business-mentee-01@yopmail.com` / `123456`, role: `mentee`.
+- Test account (Mentor): `demo-tech-mentor-01@yopmail.com` / `123456`, role: `mentor`.
+- Test account (Mentee): `demo-tech-mentee-01@yopmail.com` / `123456`, role: `mentee`.
 
 The demo data (20 mentees, 50 mentors) (`/seed`) and the 8 sample documents (`/documents`) are already loaded on the live app.
 

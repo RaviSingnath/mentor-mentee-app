@@ -85,6 +85,18 @@ export async function* runChat(
   deps: ChatDeps,
   input: { conversation_id?: string; message: string },
 ): AsyncGenerator<ChatEvent> {
+  // Anything unexpected (a database call that throws, say) must still end the stream with an error, never a silent spinner.
+  try {
+    yield* runChatSteps(deps, input);
+  } catch (e) {
+    yield errorEvent(e);
+  }
+}
+
+async function* runChatSteps(
+  deps: ChatDeps,
+  input: { conversation_id?: string; message: string },
+): AsyncGenerator<ChatEvent> {
   const { admin, userId } = deps;
   const question = input.message;
 
