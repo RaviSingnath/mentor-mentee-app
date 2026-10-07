@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +29,7 @@ import { loginAction } from "@/features/auth/auth.actions";
 
 export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
   const router = useRouter();
+  const [isNavigating, startTransition] = useTransition();
 
   const {
     register,
@@ -68,8 +70,10 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
       }
 
       reset();
-      router.push("/profile");
-      // router.refresh();
+      startTransition(() => {
+        router.push("/dashboard");
+        router.refresh();
+      });
     } catch (error) {
       console.error(error);
 
@@ -133,8 +137,8 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
               )}
             </Field>
             <Field>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Log you in..." : "Login"}
+              <Button type="submit" disabled={isSubmitting || isNavigating}>
+                {isSubmitting || isNavigating ? "Logging you in…" : "Login"}
               </Button>
               <Button variant="outline" type="button" disabled>
                 Login with Google

@@ -6,8 +6,6 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/app/providers";
 
 import "./globals.css";
-import LeftLayout from "@/components/home/left-section/left-layout";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import { Toaster } from "sonner";
 
 const inter = Inter({
