@@ -31,6 +31,10 @@ export const Errors = {
     );
   },
 
+  debugVar(msg: string) {
+    return new AppError(`${msg}`, 409, ERROR_CODES.ALREADY_EXISTS);
+  },
+
   inviteFailed(error: AuthError) {
     return new AppError(
       "A user with this email already exists.",
