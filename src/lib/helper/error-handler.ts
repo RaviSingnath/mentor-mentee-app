@@ -16,7 +16,7 @@ export function handleActionError(
 
   switch (result.code) {
     case ERROR_CODES.UNAUTHORIZED:
-      if (router) router.push("/login");
+      if (router) router.push("/");
       break;
 
     case ERROR_CODES.FORBIDDEN:

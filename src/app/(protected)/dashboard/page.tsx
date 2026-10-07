@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { getCurrentUserServer } from "@/lib/auth/getCurrentUserServer";
-import SuperAdminDashboard from "@/features/dashboard/components/super-admin/super-admin-dashboard";
+import DashboardWrapper from "@/components/layout/dashboard-wrapper";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -13,16 +13,8 @@ export default async function DashboardPage() {
   const user = await getCurrentUserServer();
 
   if (!user) {
-    redirect("/login");
+    redirect("/");
   }
 
-  switch (user.role) {
-    case "super_admin": {
-      // const data = await getSupervisorDashboardService();
-      return <SuperAdminDashboard user={user} />;
-    }
-
-    default:
-      redirect("/unauthorized");
-  }
+  return <DashboardWrapper user={user}></DashboardWrapper>;
 }
