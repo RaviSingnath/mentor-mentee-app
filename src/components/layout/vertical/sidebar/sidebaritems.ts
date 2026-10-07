@@ -46,6 +46,9 @@ import {
   CircleUserRound,
   Upload,
   UserGroup,
+  FileSpreadsheet,
+  MessagesSquare,
+  UserPlus
 } from "lucide-react";
 
 export const SidebarContent: Record<UserRole, MenuItem[]> = {
@@ -69,6 +72,12 @@ export const SidebarContent: Record<UserRole, MenuItem[]> = {
           name: "Seed Data",
           icon: Upload,
           url: "/seed",
+        },
+        {
+          id: uniqueId(),
+          name: "Documents",
+          icon: FileSpreadsheet,
+          url: "/documents",
         },
         {
           id: uniqueId(),
@@ -102,6 +111,12 @@ export const SidebarContent: Record<UserRole, MenuItem[]> = {
         },
         {
           id: uniqueId(),
+          name: "Documents",
+          icon: FileSpreadsheet,
+          url: "/documents",
+        },
+        {
+          id: uniqueId(),
           name: "Matches",
           icon: UserGroup,
           url: "/matches",
@@ -132,14 +147,26 @@ export const SidebarContent: Record<UserRole, MenuItem[]> = {
         },
         {
           id: uniqueId(),
+          name: "Documents",
+          icon: FileSpreadsheet,
+          url: "/documents",
+        },
+        {
+          id: uniqueId(),
           name: "Matches",
           icon: UserGroup,
           url: "/matches",
         },
         {
           id: uniqueId(),
+          name: "Chat",
+          icon: MessagesSquare,
+          url: "/chat",
+        },
+        {
+          id: uniqueId(),
           name: "Saved Matches",
-          icon: UserGroup,
+          icon: UserPlus,
           url: "/saved-matches",
         },
       ],
@@ -168,14 +195,26 @@ export const SidebarContent: Record<UserRole, MenuItem[]> = {
         },
         {
           id: uniqueId(),
+          name: "Documents",
+          icon: FileSpreadsheet,
+          url: "/documents",
+        },
+        {
+          id: uniqueId(),
           name: "Matches",
           icon: UserGroup,
           url: "/matches",
         },
         {
           id: uniqueId(),
+          name: "Chat",
+          icon: MessagesSquare,
+          url: "/chat",
+        },
+        {
+          id: uniqueId(),
           name: "Saved Matches",
-          icon: UserGroup,
+          icon: UserPlus,
           url: "/saved-matches",
         },
       ],
