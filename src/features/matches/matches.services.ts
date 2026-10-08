@@ -2,13 +2,14 @@
 
 import {
   getCandidatesProfileQuery,
-  getMatchPoolQuery,
+  getMatchPoolRPCQuery,
   getSavedMatchesQuery,
   isActiveMemberQuery,
 } from "./matches.queries";
-import createClient from "../../../supabase/server";
 import { mapSupabaseError } from "@/lib/errors/supabase-error";
 import { createRequestContext } from "@/lib/auth/request-context";
+import { PoolProfile } from "@/lib/matches/types";
+import { parseMatchPool } from "./matches.schema";
 
 export async function isActiveMemberService() {
   const { data: isMember, error } = await isActiveMemberQuery();
@@ -20,22 +21,15 @@ export async function isActiveMemberService() {
   };
 }
 
-export async function getMatchPoolService() {
-  const supabase = await createClient();
+export async function getMatchPoolService(): Promise<PoolProfile[]> {
+  // Check for unauthorized usere as well
+  await createRequestContext();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user?.email) {
-    throw new Error("Your not authenticated.");
-  }
-
-  const { data, error } = await getMatchPoolQuery();
+  const { data, error } = await getMatchPoolRPCQuery();
 
   if (error) throw mapSupabaseError(error);
 
-  return { data: data };
+  return parseMatchPool(data);
 }
 
 export async function getSavedMatchesService() {

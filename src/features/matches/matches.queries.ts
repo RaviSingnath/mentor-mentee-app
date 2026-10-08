@@ -35,7 +35,7 @@ export async function getSavedMatchesQuery(
     .eq("subject_id", subjectId);
 }
 
-export async function getMatchPoolQuery() {
+export async function getMatchPoolRPCQuery() {
   return supabaseAdmin.rpc("match_pool");
 }
 

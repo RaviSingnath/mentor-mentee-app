@@ -1,4 +1,3 @@
-import { loadMatchPool } from "./pool";
 import type {
   BuildArgs,
   InteractionRow,
@@ -13,6 +12,7 @@ import {
   getMatchInteractionsQuery,
   getSavedMatchesQuery,
 } from "@/features/matches/matches.queries";
+import { getMatchPoolService } from "@/features/matches/matches.services";
 
 /** How much of a profile is filled in. Mirrors profileCompleteness() in features/profile, but on pool data. */
 export interface ProfileStrength {
@@ -167,7 +167,7 @@ export async function getMatchView(args: {
 
   const subjectParam = isAdmin ? args.subjectParam : null; // members can only ever see their own matches
 
-  const pool = await loadMatchPool();
+  const pool = await getMatchPoolService();
 
   const subjectId =
     subjectParam ?? (pool.some((p) => p.id === viewerId) ? viewerId : null);
