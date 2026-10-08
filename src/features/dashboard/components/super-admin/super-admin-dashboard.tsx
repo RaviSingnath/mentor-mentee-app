@@ -19,7 +19,7 @@ export default async function SuperAdminDashboard({
   user,
 }: SuperAdminDashboardProps) {
   const invites = await getInvitesService();
-  console.log("invites: ", invites);
+
   return (
     <Card>
       <CardHeader>

@@ -21,7 +21,7 @@ export default async function MatchesPage({
   searchParams: Promise<{ subject?: string }>;
 }) {
   const user = await getCurrentUserServer();
-  if (!user) redirect("/"); // adjust to your sign-in route
+  if (!user) redirect("/");
 
   const userRole = user?.role as UserRole | undefined;
 

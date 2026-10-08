@@ -1,6 +1,7 @@
 import UserRole from "@/lib/rbac/roles";
-import SuperAdminDashboard from "@/features/dashboard/components/super-admin/super-admin-dashboard";
 import { AuthUser } from "@/lib/types";
+import SuperAdminDashboard from "@/features/dashboard/components/super-admin/super-admin-dashboard";
+import UserDashboard from "@/features/dashboard/components/user/user-dashboard";
 
 export default function DashboardContent({ user }: { user: AuthUser }) {
   const userRole = user?.role as UserRole;
@@ -13,10 +14,10 @@ export default function DashboardContent({ user }: { user: AuthUser }) {
       return <div>Admin</div>;
 
     case "mentor":
-      return <div>Mentor</div>;
+      return <UserDashboard user={user} />;
 
     case "mentee":
-      return <div>Mentee</div>;
+      return <UserDashboard user={user} />;
 
     default:
       return null;
