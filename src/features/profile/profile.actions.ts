@@ -7,7 +7,8 @@ import { ActionResponse } from "@/lib/types/action-response";
 import { ERROR_CODES } from "@/lib/errors/error-codes";
 import { getZodFieldErrors } from "@/lib/helper/get-zod-field-errors";
 import { updateProfileMutation } from "./profile.mutation";
-import { mapSupabaseError } from "@/lib/errors/supabase-error";
+import { throwOnSupabaseError } from "@/lib/errors/supabase-error";
+import { handleError } from "@/lib/errors/handle-error";
 
 /**
  * Saves the whole profile form in one database call (public.save_my_profile), which validates again and writes
@@ -17,27 +18,27 @@ import { mapSupabaseError } from "@/lib/errors/supabase-error";
 export async function saveProfileAction(
   input: unknown,
 ): Promise<ActionResponse> {
-  await createRequestContext();
+  try {
+    await createRequestContext();
 
-  const validatedFields = zProfile.safeParse(input);
+    const validatedFields = zProfile.safeParse(input);
+    if (!validatedFields.success) {
+      return {
+        success: false,
+        code: ERROR_CODES.VALIDATION_ERROR,
+        message: "Validation failed",
+        errors: getZodFieldErrors(validatedFields.error),
+      };
+    }
 
-  if (!validatedFields.success) {
-    return {
-      success: false,
-      code: ERROR_CODES.VALIDATION_ERROR,
-      message: "Validation failed",
-      errors: getZodFieldErrors(validatedFields.error),
-    };
+    const { error } = await updateProfileMutation(validatedFields.data);
+    throwOnSupabaseError({ error });
+
+    revalidatePath("/profile");
+    revalidatePath("/matches");
+
+    return { success: true };
+  } catch (e) {
+    return handleError(e);
   }
-
-  const v = validatedFields.data;
-
-  const { error } = await updateProfileMutation(v);
-
-  if (error) throw mapSupabaseError(error);
-
-  revalidatePath("/profile");
-  revalidatePath("/matches");
-
-  return { success: true };
 }

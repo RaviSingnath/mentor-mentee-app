@@ -109,9 +109,11 @@ export function buildMatchView({
   const requestedId = isAdmin ? subjectId : null;
   const effectiveId =
     requestedId ?? (pool.some((p) => p.id === viewerId) ? viewerId : null);
+
   const subject = effectiveId
     ? pool.find((p) => p.id === effectiveId)
     : undefined;
+
   if (!subject)
     return {
       subject: null,
@@ -171,6 +173,7 @@ export async function getMatchView(args: {
 
   const subjectId =
     subjectParam ?? (pool.some((p) => p.id === viewerId) ? viewerId : null);
+
   if (!subjectId) {
     return buildMatchView({
       pool,

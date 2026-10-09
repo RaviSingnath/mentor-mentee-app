@@ -11,71 +11,57 @@ import {
 } from "../invite/invite.mutations";
 import { mapSupabaseError } from "@/lib/errors/supabase-error";
 import { generateToken } from "@/lib/helper/generate-token";
-import { mapSupabaseAuthError } from "@/lib/errors/supabase-auth-error";
+import {
+  mapSupabaseAuthError,
+  throwOnAuthError,
+} from "@/lib/errors/supabase-auth-error";
 import { InvitationInsert } from "../invite/invite.types";
 import { getExpiresAtDate } from "@/lib/helper/date";
 import { getAuthCallbackUrl, getSiteUrl } from "@/lib/site-url";
 
 type signupServiceInput = {
-  data: TSignUp;
+  signupData: TSignUp;
 };
 
-export async function signUpService({ data }: signupServiceInput) {
+export async function signUpService({ signupData }: signupServiceInput) {
   const supabase = await createClient();
-
   const redirectUrl = await getAuthCallbackUrl();
 
-  const { data: signupData, error } = await supabase.auth.signUp({
-    email: data.email,
-    password: data.password,
+  const { data, error } = await supabase.auth.signUp({
+    email: signupData.email,
+    password: signupData.password,
     options: {
-      data: {
-        full_name: data.full_name,
-        role: data.role,
-      },
+      data: { full_name: signupData.full_name, role: signupData.role },
       emailRedirectTo: redirectUrl,
     },
   });
+  throwOnAuthError(error, "signup"); // real failures: weak password, invalid email, rate limit, network
 
-  if (error) {
-    if (error.code === "user_already_exists" || error.code === "email_exists") {
-      throw Errors.alreadyExists("An account with this email");
-    }
+  // Email already has a confirmed account: Supabase returns a made-up user with no identities.
+  // Nothing was created and no email was sent. The caller treats it exactly like a new sign-up,
+  // so the user cannot tell the two cases apart. We only log it for ourselves.
+  const alreadyRegistered =
+    !data.user || (data.user.identities?.length ?? 0) === 0;
+  if (alreadyRegistered)
+    console.info("signup: email already registered, no email sent");
 
-    if (error.code === "over_email_send_rate_limit" || error.status === 429) {
-      throw Errors.emailLimit(error);
-    }
-
-    throw Errors.internal();
-  }
-
-  if (signupData.user?.identities?.length === 0) {
-    throw Errors.alreadyExists("An account with this email");
-  }
-
-  if (!signupData.user) throw Errors.internal();
-
-  return signupData.user;
+  return { alreadyRegistered };
 }
 
 type loginServiceInput = {
-  data: TLogin;
+  singInData: TLogin;
 };
 
-export async function loginService({ data }: loginServiceInput) {
+export async function loginService({ singInData }: loginServiceInput) {
   const supabase = await createClient();
 
-  const { data: singInData, error: signInError } =
-    await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email: singInData.email,
+    password: singInData.password,
+  });
 
-  if (signInError) {
-    throw new Error("Error occured while singing in.");
-  }
-
-  return singInData;
+  throwOnAuthError(error);
+  return { userId: data.user!.id };
 }
 
 export async function logoutService(): Promise<null> {

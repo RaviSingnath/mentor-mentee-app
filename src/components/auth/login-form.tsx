@@ -34,7 +34,7 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
   const {
     register,
     handleSubmit,
-    reset,
+    clearErrors,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<TLogin>({
@@ -45,38 +45,36 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
     },
   });
 
+  const isBusy = isSubmitting || isNavigating;
+
   async function onSubmit(formData: TLogin) {
+    clearErrors("root.server");
     try {
       const response = await loginAction(formData);
 
       if (!response.success) {
         if (response.errors) {
-          Object.entries(response.errors).forEach(([field, messages]) => {
+          for (const [field, msgs] of Object.entries(response.errors)) {
             setError(field as keyof TLogin, {
               type: "server",
-              message: messages[0],
+              message: msgs[0],
             });
-          });
-        }
-
-        if (response.message) {
-          setError("root", {
+          }
+        } else {
+          setError("root.server", {
             type: "server",
             message: response.message,
           });
         }
-
         return;
       }
 
-      reset();
       startTransition(() => {
         router.push("/dashboard");
       });
     } catch (error) {
       console.error(error);
-
-      setError("root", {
+      setError("root.server", {
         type: "server",
         message: "Something went wrong. Please try again.",
       });
@@ -135,9 +133,16 @@ export function LoginForm({ ...props }: React.ComponentProps<typeof Card>) {
                 </FieldDescription>
               )}
             </Field>
+
+            {errors.root?.server && (
+              <p role="alert" className="text-destructive text-sm">
+                {errors.root.server.message}
+              </p>
+            )}
+
             <Field>
-              <Button type="submit" disabled={isSubmitting || isNavigating}>
-                {isSubmitting || isNavigating ? "Logging you in…" : "Login"}
+              <Button type="submit" disabled={isBusy}>
+                {isBusy ? "Logging you in…" : "Login"}
               </Button>
               <Button variant="outline" type="button" disabled>
                 Login with Google

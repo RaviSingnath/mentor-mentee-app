@@ -20,7 +20,6 @@ import {
   FieldError,
   FieldGroup,
   FieldLabel,
-  FieldLegend,
   FieldSet,
 } from "@/components/ui/field";
 import {
@@ -38,6 +37,7 @@ import { TSignUp, zSignUp } from "@/features/auth/auth.schema";
 import UserRole, { UserRoleLabel } from "@/lib/rbac/roles";
 import { signUpAction } from "@/features/auth/auth.actions";
 import { appToast } from "@/lib/helper/toast";
+import { applyActionErrors } from "@/lib/errors/forms/apply-action-errors";
 
 type RoleOption = {
   role: UserRole;
@@ -57,6 +57,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     control,
     handleSubmit,
     reset,
+    clearErrors,
     setError,
     formState: { errors, isSubmitting },
   } = useForm<TSignUp>({
@@ -71,38 +72,22 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   });
 
   async function onSubmit(formData: TSignUp) {
+    clearErrors("root.server");
     try {
       const response = await signUpAction(formData);
 
       if (!response.success) {
-        if (response.errors) {
-          Object.entries(response.errors).forEach(([field, messages]) => {
-            setError(field as keyof TSignUp, {
-              type: "server",
-              message: messages[0],
-            });
-          });
-        }
-
-        if (response.message) {
-          setError("root", {
-            type: "server",
-            message: response.message,
-          });
-        }
-
+        applyActionErrors(response, setError);
         return;
       }
 
       reset();
       appToast.success(
-        "Signup successfully done. Please check you mail to confirm your email.",
+        "If this email can be registered, we've sent a confirmation link. Please check your inbox. Already have an account? Sign in or reset your password.",
       );
     } catch (error) {
       console.error(error);
-      appToast.error("Something went wrong. Please try again.");
-
-      setError("root", {
+      setError("root.server", {
         type: "server",
         message: "Something went wrong. Please try again.",
       });
@@ -256,7 +241,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             </FieldSet>
 
             {/* Root/server error */}
-            {errors.root && <FieldError>{errors.root.message}</FieldError>}
+            {errors.root?.server && (
+              <FieldError>{errors.root.server.message}</FieldError>
+            )}
 
             {/* Actions */}
             <FieldGroup>

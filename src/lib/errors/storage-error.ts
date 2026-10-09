@@ -112,6 +112,7 @@ export function mapStorageError(error: StorageErrorLike) {
 
     default:
       // 5xx and StorageUnknownError (network failures, no status)
+      console.error("Unmapped storage error:", { name: error.name, status: error.status, statusCode: error.statusCode, message: error.message });
       return new AppError(
         "A file storage error occurred.",
         500,

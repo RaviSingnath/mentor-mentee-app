@@ -29,27 +29,16 @@ export async function signUpAction(formData: TSignUp): Promise<ActionResponse> {
     return {
       success: false,
       code: ERROR_CODES.VALIDATION_ERROR,
-      message: "Validation failed",
+      message: "Please check the highlighted fields.",
       errors: getZodFieldErrors(validatedFields.error),
     };
   }
 
   try {
-    const user = await signUpService({ data: validatedFields.data });
-
-    if (!user)
-      return {
-        success: false,
-        code: ERROR_CODES.DATABASE_ERROR,
-        message: "asda",
-      };
-
-    return {
-      success: true,
-      data: { id: user.id, email: user.email },
-    };
+    await signUpService({ signupData: validatedFields.data });
+    return { success: true }; // new user and existing email look identical to the caller
   } catch (error) {
-    return handleError(error);
+    return handleError(error, "signup");
   }
 }
 
@@ -66,14 +55,11 @@ export async function loginAction(formData: TLogin): Promise<ActionResponse> {
   }
 
   try {
-    const profile = await loginService({
-      data: validatedFields.data,
+    await loginService({
+      singInData: validatedFields.data,
     });
 
-    return {
-      success: true,
-      data: profile,
-    };
+    return { success: true };
   } catch (error) {
     return handleError(error);
   }

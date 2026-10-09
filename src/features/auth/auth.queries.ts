@@ -2,6 +2,7 @@
 
 import { QueryData } from "@supabase/supabase-js";
 import createClient from "../../../supabase/server";
+import { supabaseAdmin } from "../../../supabase/admin";
 
 export const getCurrentUserQuery = async (userID: string) => {
   const supabase = await createClient();
@@ -31,3 +32,12 @@ export const getCurrentUserQuery = async (userID: string) => {
 export type CurrentUserQueryResult = QueryData<
   ReturnType<typeof getCurrentUserQuery>
 >;
+
+export const checkAlreadySignupEmailQuery = async (email: string) => {
+  return supabaseAdmin
+    .from("profiles")
+    .select("id")
+    .eq("email", email.toLowerCase())
+    .eq("is_seed", true)
+    .maybeSingle();
+};
