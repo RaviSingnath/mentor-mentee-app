@@ -1,4 +1,4 @@
-import createClient from "../../../supabase/server";
+import createClient from "@/supabase/server";
 import { toSaveMyProfileArgs } from "./profile.rpc";
 import type { TProfile } from "./profile.schema";
 

@@ -13,7 +13,7 @@ export type UserContext = User & {
   raw?: UserAppMetadata;
 };
 
-import { Database } from "../../../supabase/database.types";
+import { Database } from "@/supabase/database.types";
 import { currentUserProfile } from "../auth/current-user-profile";
 
 export type AuthUser = Awaited<ReturnType<typeof currentUserProfile>>;

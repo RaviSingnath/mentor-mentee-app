@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import createClient from "../../../supabase/server";
+import createClient from "@/supabase/server";
 
 export type MatchActionResult = { ok: true } | { ok: false; error: string };
 

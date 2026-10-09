@@ -1,6 +1,6 @@
 "use server";
 
-import createClient from "../../../supabase/server";
+import createClient from "@/supabase/server";
 import { EXPERIENCE_LEVELS } from "@/lib/matching/constants";
 import { type ExperienceLevel } from "@/lib/matching/types";
 import type { TProfileInput } from "./profile.schema";

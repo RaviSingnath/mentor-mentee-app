@@ -4,7 +4,7 @@ import { ConversationList } from "./_components/conversation-list";
 import { listConversations, loadMessages } from "@/features/chat/chat.queries";
 import { zConversationId } from "@/features/chat/chat.schema";
 import { getCurrentUserServer } from "@/lib/auth/getCurrentUserServer";
-import createClient from "../../../../supabase/server";
+import createClient from "@/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;

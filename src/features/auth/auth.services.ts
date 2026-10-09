@@ -1,7 +1,7 @@
 import { TSignUp, TLogin, TInviteAdmin } from "@/features/auth/auth.schema";
-import createClient from "../../../supabase/server";
+import createClient from "@/supabase/server";
+import { supabaseAdmin } from "@/supabase/admin";
 import { RequestContext } from "@/lib/auth/request-context";
-import { supabaseAdmin } from "../../../supabase/admin";
 import { assertCanInvite } from "./security/invite.create.security";
 import { getInviteByEmail } from "../invite/invite.queries";
 import { Errors } from "@/lib/errors/error-factory";

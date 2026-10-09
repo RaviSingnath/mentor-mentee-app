@@ -1,8 +1,8 @@
 "use server";
 
 import { QueryData } from "@supabase/supabase-js";
-import createClient from "../../../supabase/server";
-import { supabaseAdmin } from "../../../supabase/admin";
+import createClient from "@/supabase/server";
+import { supabaseAdmin } from "@/supabase/admin";
 
 export const getCurrentUserQuery = async (userID: string) => {
   const supabase = await createClient();

@@ -1,5 +1,5 @@
 import UserRole from "@/lib/rbac/roles";
-import { Database } from "../../../supabase/database.types";
+import { Database } from "@/supabase/database.types";
 
 export type Invitation = Database["public"]["Tables"]["invitations"]["Row"];
 

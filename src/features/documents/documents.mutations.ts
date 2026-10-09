@@ -1,6 +1,6 @@
-import { supabaseAdmin } from "../../../supabase/admin";
+import { supabaseAdmin } from "@/supabase/admin";
 import { titleFromFilename, TUploadRequest } from "./documents.schema";
-import { Database } from "../../../supabase/database.types";
+import { Database } from "@/supabase/database.types";
 import { DOCUMENTS_BUCKET } from "./documents.ingest";
 
 type ChunkInsert = Database["public"]["Tables"]["document_chunks"]["Insert"];

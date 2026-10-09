@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Database } from "../../../supabase/database.types";
+import type { Database } from "@/supabase/database.types";
 import type { ChatMessage, Source } from "./chat.schema";
 
 export interface ConversationRow {

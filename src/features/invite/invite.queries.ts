@@ -1,6 +1,6 @@
 "use server";
 
-import createClient from "../../../supabase/server";
+import createClient from "@/supabase/server";
 
 export const getInviteByEmail = async (inviteEmail: string) => {
   const supabase = await createClient();

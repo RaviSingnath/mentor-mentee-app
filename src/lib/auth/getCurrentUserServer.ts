@@ -1,4 +1,4 @@
-import createClient from "../../../supabase/server";
+import createClient from "@/supabase/server";
 import { getCurrentUserQuery } from "@/features/auth/auth.queries";
 import { currentUserProfile } from "./current-user-profile";
 import { AuthUser } from "../types";

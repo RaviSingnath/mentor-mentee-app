@@ -2,15 +2,18 @@ import { embedQuestion } from "@/lib/ai/embeddings";
 import { streamGemini } from "@/lib/ai/gemini";
 import { runChat, type RetrievedChunk } from "@/features/chat/chat.pipeline";
 import { zAsk } from "@/features/chat/chat.schema";
-import { supabaseAdmin } from "../../../../supabase/admin";
-import createClient from "../../../../supabase/server";
+import { supabaseAdmin } from "@/supabase/admin";
+import createClient from "@/supabase/server";
 
 // Answering involves a search, a model call and a streamed reply; give it room on Vercel.
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 const json = (body: unknown, status: number) =>
-  new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { "content-type": "application/json" },
+  });
 
 export async function POST(req: Request) {
   const supabase = await createClient();
@@ -20,7 +23,8 @@ export async function POST(req: Request) {
   if (!user) return json({ error: "Not signed in" }, 401);
 
   const active = await supabase.rpc("is_active_member");
-  if (active.data !== true) return json({ error: "Your account is not active" }, 403);
+  if (active.data !== true)
+    return json({ error: "Your account is not active" }, 403);
 
   let body: unknown;
   try {
@@ -29,7 +33,11 @@ export async function POST(req: Request) {
     return json({ error: "Invalid request" }, 400);
   }
   const parsed = zAsk.safeParse(body);
-  if (!parsed.success) return json({ error: parsed.error.issues[0]?.message ?? "Invalid request" }, 400);
+  if (!parsed.success)
+    return json(
+      { error: parsed.error.issues[0]?.message ?? "Invalid request" },
+      400,
+    );
 
   const events = runChat(
     {
@@ -65,11 +73,17 @@ export async function POST(req: Request) {
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
-        for await (const ev of events) controller.enqueue(encoder.encode(`${JSON.stringify(ev)}\n`));
+        for await (const ev of events)
+          controller.enqueue(encoder.encode(`${JSON.stringify(ev)}\n`));
       } finally {
         controller.close();
       }
     },
   });
-  return new Response(stream, { headers: { "content-type": "application/x-ndjson; charset=utf-8", "cache-control": "no-store" } });
+  return new Response(stream, {
+    headers: {
+      "content-type": "application/x-ndjson; charset=utf-8",
+      "cache-control": "no-store",
+    },
+  });
 }

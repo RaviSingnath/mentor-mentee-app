@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/field";
 
 import { zAcceptInvite, TAcceptInvite } from "@/features/auth/auth.schema";
-import { createClient } from "../../../supabase/client";
+import { createClient } from "@/supabase/client";
 import { acceptInviteAction } from "@/features/invite/invite.action";
 
 export default function AcceptInviteForm({

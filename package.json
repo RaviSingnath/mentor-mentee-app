@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:types": "pnpm dlx supabase gen types typescript --project-id mrlmgtucchcehgvwsmtx --schema public > supabase/database.types.ts"
+    "db:types": "pnpm dlx supabase gen types typescript --project-id mrlmgtucchcehgvwsmtx --schema public > src/supabase/database.types.ts"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

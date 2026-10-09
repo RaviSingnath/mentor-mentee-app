@@ -1,7 +1,7 @@
 "use server";
 
-import { supabaseAdmin } from "../../../supabase/admin";
-import createClient from "../../../supabase/server";
+import { supabaseAdmin } from "@/supabase/admin";
+import createClient from "@/supabase/server";
 
 export async function isActiveMemberQuery() {
   const supabase = await createClient();

@@ -1,6 +1,6 @@
 import type { TDocumentMime, TDocumentStatus } from "./documents.schema";
-import createClient from "../../../supabase/server";
-import { supabaseAdmin } from "../../../supabase/admin";
+import createClient from "@/supabase/server";
+import { supabaseAdmin } from "@/supabase/admin";
 import { DOCUMENTS_BUCKET } from "./documents.ingest";
 
 export interface DocumentRow {

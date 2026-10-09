@@ -1,4 +1,4 @@
-import createClient from "../../../supabase/server";
+import createClient from "@/supabase/server";
 
 /**
  * True when the signed-in user is an active admin or super_admin.

@@ -1,8 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { supabaseAdmin } from "../../../supabase/admin";
-import createClient from "../../../supabase/server";
+import { supabaseAdmin } from "@/supabase/admin";
+import createClient from "@/supabase/server";
 import { zConversationId } from "./chat.schema";
 
 export type TDeleteConversationResult =

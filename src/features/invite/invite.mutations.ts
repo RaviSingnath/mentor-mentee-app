@@ -1,6 +1,6 @@
 "use server";
 
-import createClient from "../../../supabase/server";
+import createClient from "@/supabase/server";
 import { InvitationInsert } from "./invite.types";
 
 export const cancelOlderInviteByEmail = async (email: string) => {

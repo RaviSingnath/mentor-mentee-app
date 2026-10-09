@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { isCurrentUserAdmin } from "@/lib/auth/is-admin";
-import { supabaseAdmin } from "../../../supabase/admin";
+import { supabaseAdmin } from "@/supabase/admin";
 import {
   createSeedBatch,
   purgeSeedData,

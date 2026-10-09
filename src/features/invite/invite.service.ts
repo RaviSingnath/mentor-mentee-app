@@ -1,8 +1,8 @@
 "use server";
 
 import UserRole from "@/lib/rbac/roles";
-import { supabaseAdmin } from "../../../supabase/admin";
-import createClient from "../../../supabase/server";
+import { supabaseAdmin } from "@/supabase/admin";
+import createClient from "@/supabase/server";
 import { getInvitesQuery } from "./invite.queries";
 import { mapSupabaseError } from "@/lib/errors/supabase-error";
 

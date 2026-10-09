@@ -1,12 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Json } from "../../../supabase/database.types";
+import type { Json } from "@/supabase/database.types";
 import {
   GeminiBlockedError,
   GeminiRateLimitError,
   GeminiUnavailableError,
 } from "@/lib/ai/errors";
 import type { GeminiEvent } from "@/lib/ai/gemini";
-import type { Database } from "../../../supabase/database.types";
+import type { Database } from "@/supabase/database.types";
 import {
   buildTurns,
   retrievalQuery,
